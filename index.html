@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark-theme">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>LingoMaster Premium</title>
+  
+  <!-- PWA ve Tam Ekran (Standalone) Ayarları -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#09090b" id="meta-theme-color" />
+  
+  <!-- iOS (Apple) Özel Ayarları -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="apple-status-bar" />
+  <meta name="apple-mobile-web-app-title" content="LingoMaster" />
+  <link rel="apple-touch-icon" href="icon.png" />
+
+  <!-- ERKEN TEMA KONTROLÜ -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('lingo_theme') || 'light';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-theme');
+        document.write('<style>html, body, #splash-screen { background-color: #09090b !important; }</style>');
+      } else {
+        document.documentElement.classList.remove('dark-theme');
+        document.write('<style>html, body, #splash-screen { background-color: #f4f4f5 !important; }</style>');
+      }
+    })();
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #e0e7ff;
+      --bg: #f4f4f5;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      
+      --success: #10b981;
+      --danger: #ef4444;
+      --level-badge: #f59e0b;
+      --gold: #f59e0b;
+      
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html.dark-theme, body.dark-theme {
+      --primary: #818cf8;
+      --primary-hover: #6366f1;
+      --primary-light: rgba(99, 102, 241, 0.15);
+      --bg: #09090b;
+      --card-bg: #18181b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #27272a;
+      --gold: #fbbf24;
+      
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 25px 30px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    html, body {
+      background-color: var(--bg);
+      color: var(--text);
+      width: 100%;
+      height: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      overflow: hidden;
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      transition: background-color 0.4s ease, color 0.4s ease;
+    }
+
+    body { display: flex; flex-direction: column; }
+    
+    #splash-screen {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 99999; transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.8s ease, background-color 0.4s ease;
+    }
+    .splash-logo-container { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; animation: premiumZoomIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    .splash-logo-svg { filter: drop-shadow(0 0 35px rgba(129, 140, 248, 0.3)); }
+    .splash-title { color: var(--text); font-size: 2.2rem; font-weight: 800; letter-spacing: -0.5px; opacity: 0; animation: fadeInText 0.8s ease 0.4s forwards; }
+
+    @keyframes premiumZoomIn { 0% { transform: scale(0.6); opacity: 0; filter: blur(10px); } 100% { transform: scale(1); opacity: 1; filter: blur(0px); } }
+    @keyframes fadeInText { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .splash-fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    header { padding: calc(14px + env(safe-area-inset-top)) 20px 14px 20px; background: var(--card-bg); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 10; transition: var(--transition); flex-shrink: 0; }
+    .header-logo-title { display: flex; align-items: center; gap: 12px; }
+    .header-logo-title svg { width: 30px; height: 30px; }
+    header h1 { font-size: 1.25rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
+    
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .streak-badge { background: var(--primary-light); color: var(--primary); font-weight: 700; font-size: 0.8rem; padding: 5px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
+    .premium-flame { width: 14px; height: 14px; stroke: var(--gold); fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 3px rgba(245,158,11,0.5)); }
+
+    .theme-toggle { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+    .theme-toggle:hover { background: var(--primary-light); color: var(--primary); }
+    .theme-toggle svg { width: 20px; height: 20px; fill: currentColor; }
+
+    main { flex: 1; overflow-y: auto; padding: 14px 20px; overflow-x: hidden; scroll-behavior: smooth; display: flex; flex-direction: column; -webkit-overflow-scrolling: touch; background-color: var(--bg); transition: background-color 0.4s ease; }
+    main::-webkit-scrollbar { width: 4px; }
+    main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    .view { display: none; flex: 1; flex-direction: column; padding-bottom: 16px; }
+    .view.active { display: flex; animation: fadeSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* ÜST BAR VE BUTONLAR */
+    .vocab-top-bar { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 12px; transition: var(--transition); flex-shrink: 0; }
+    .vocab-status-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .vocab-status-badge { background: var(--primary-light); color: var(--primary); font-size: 0.75rem; font-weight: 700; padding: 6px 10px; border-radius: 10px; border: 1px solid rgba(99, 102, 241, 0.2); display: flex; align-items: center; gap: 4px; }
+    .vocab-status-badge svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2.5; fill: none; }
+    
+    .vocab-actions-right { display: flex; gap: 8px; align-items: center; }
+    .vocab-icon-btn { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); padding: 8px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); box-shadow: var(--shadow-sm); }
+    .vocab-icon-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.05); }
+    .vocab-icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .mini-progress-container { background: var(--card-bg); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 12px; cursor: pointer; transition: var(--transition); flex-shrink: 0; }
+    .mini-progress-container:hover { background: var(--primary-light); border-color: var(--primary); }
+    .mini-progress-header { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; color: var(--text-muted); }
+    .progress-bar-bg { background: var(--bg); height: 8px; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid var(--border); }
+    .progress-bar-fill { background: linear-gradient(90deg, var(--primary), #818cf8); height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 8px; }
+
+    .search-input { width: 100%; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 14px; font-size: 0.9rem; color: var(--text); background: var(--card-bg); outline: none; margin-bottom: 12px; box-shadow: var(--shadow-sm); transition: var(--transition); }
+    .search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+    .swipe-hint-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; flex-shrink: 0; }
+    .swipe-hint { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--text-muted); padding: 5px 12px; border-radius: 20px; background: var(--card-bg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); }
+    .swipe-hint svg { width: 14px; height: 14px; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .swipe-hint.danger svg { stroke: var(--danger); }
+    .swipe-hint.success svg { stroke: var(--success); }
+    .swipe-hint-divider { width: 1px; height: 14px; background-color: var(--border); }
+
+    #card-area { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding-bottom: 6px; }
+
+    .card-container { perspective: 1000px; width: 100%; margin: 4px 0 12px 0; height: 260px; position: relative; display: flex; align-items: center; justify-content: center; }
+    .card { background: var(--card-bg); border-radius: var(--radius-lg); padding: 20px 18px; height: 260px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); border: 1px solid var(--border); text-align: center; position: absolute; cursor: pointer; user-select: none; touch-action: pan-y; will-change: transform, box-shadow, border; transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease, border 0.3s ease, opacity 0.3s ease, background-color 0.4s ease; }
+    
+    .level-badge { background-color: var(--level-badge); color: white; font-size: 0.7rem; font-weight: 800; padding: 4px 10px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .card-level-badge { position: absolute; top: 14px; right: 14px; }
+    
+    .card .word { font-size: 2rem; font-weight: 800; color: var(--primary); margin-bottom: 4px; pointer-events: none; letter-spacing: -0.5px; }
+    .card .phonetic { font-size: 1.05rem; color: var(--text-muted); margin-bottom: 12px; pointer-events: none; font-weight: 600; font-family: monospace; letter-spacing: 0.5px; }
+    .card .meaning { font-size: 1.3rem; font-weight: 700; color: var(--text); pointer-events: none; margin-bottom: 6px; }
+    .example-container { margin-top: 6px; display: none; pointer-events: none; background: var(--bg); padding: 8px 12px; border-radius: 10px; width: 100%; border: 1px solid var(--border); text-align: left; }
+    .card .example { font-style: italic; color: var(--text); font-size: 0.85rem; font-weight: 500; }
+    .card .example-tr { margin-top: 2px; color: var(--text-muted); font-size: 0.78rem; }
+    .card-hint { margin-top: 12px; color: var(--text-muted); font-size: 0.75rem; font-weight: 500; background: var(--bg); padding: 4px 10px; border-radius: 20px; pointer-events: none; }
+    
+    .card-actions { display: flex; gap: 10px; justify-content: center; width: 100%; position: relative; z-index: 10; flex-shrink: 0; }
+    
+    button { background: var(--primary); color: white; border: none; border-radius: 12px; padding: 10px 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2); }
+    button:active { transform: scale(0.96); }
+    button.secondary { background: var(--primary-light); color: var(--primary); box-shadow: none; }
+    button.secondary:hover { background: var(--primary); color: white; }
+    button:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; box-shadow: none; transform: none; }
+
+    /* --- LÜKS ÖZEL SEÇİM KUTUSU (CUSTOM SELECT) STİLLERİ --- */
+    .premium-select-hidden { display: none !important; }
+    .custom-select-container { position: relative; user-select: none; width: 100%; font-family: 'Inter', sans-serif; }
+    .custom-select-trigger {
+        display: flex; align-items: center; justify-content: space-between;
+        background: var(--card-bg); border: 1px solid var(--border); color: var(--text);
+        padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; font-weight: 600;
+        cursor: pointer; transition: var(--transition); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .custom-select-trigger:hover { border-color: var(--primary); }
+    .custom-select-container.open .custom-select-trigger { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+    .custom-select-icon { width: 18px; height: 18px; stroke: var(--text-muted); transition: transform 0.3s ease; display:flex; align-items:center; }
+    .custom-select-container.open .custom-select-icon { transform: rotate(180deg); stroke: var(--primary); }
+    
+    .custom-select-options {
+        position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+        background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+        box-shadow: var(--shadow-lg); opacity: 0; visibility: hidden; transform: translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 10000;
+        max-height: 220px; overflow-y: auto; padding: 6px; display: flex; flex-direction: column; gap: 2px;
+    }
+    .custom-select-options::-webkit-scrollbar { width: 4px; }
+    .custom-select-options::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    .custom-select-container.open .custom-select-options { opacity: 1; visibility: visible; transform: translateY(0); }
+    .custom-select-option { padding: 10px 12px; font-size: 0.85rem; font-weight: 600; color: var(--text); cursor: pointer; border-radius: 8px; transition: var(--transition); text-align: left; }
+    .custom-select-option:hover { background: var(--bg); color: var(--primary); }
+    .custom-select-option.selected { background: var(--primary-light); color: var(--primary); font-weight: 700; }
+
+    /* Ortak Alanlar */
+    .filter-container-premium { margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: var(--transition); flex-shrink: 0; }
+    .filter-container-premium label { font-weight: 700; font-size: 0.9rem; color: var(--text); margin-right: 8px; }
+
+    .history-tabs { display: flex; gap: 6px; margin-bottom: 12px; background: var(--card-bg); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+    .history-tab { flex: 1; padding: 8px; text-align: center; border-radius: 8px; font-weight: 600; font-size: 0.85rem; background: transparent; color: var(--text-muted); transition: var(--transition); box-shadow: none; }
+    .history-tab.active { background: var(--primary); color: white; box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3); }
+    
+    .history-card { background: var(--card-bg); border-radius: var(--radius-md); padding: 14px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; flex-direction: column; box-shadow: var(--shadow-sm); transition: var(--transition); }
+    .history-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+    .history-word { font-size: 1.2rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+    .history-pronunciation { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; font-family: monospace; margin-bottom: 4px; display: block; }
+    .history-tr { font-size: 0.95rem; color: var(--text); font-weight: 600; margin-bottom: 10px; display: block; }
+    .history-actions { display: flex; justify-content: flex-end; }
+    .history-actions button { padding: 6px 12px; font-size: 0.78rem; border-radius: 8px; font-weight: 700; color: white; border: none; box-shadow: none; }
+
+    .grammar-level-card { background: var(--card-bg); border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 10px; box-shadow: var(--shadow-sm); overflow: hidden; transition: var(--transition); }
+    .grammar-level-header { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; background: var(--card-bg); transition: var(--transition); }
+    .grammar-level-header:hover { background: var(--primary-light); }
+    .grammar-level-title-wrapper { display: flex; align-items: center; gap: 8px; }
+    .grammar-level-tag { background-color: var(--primary); color: white; font-size: 0.7rem; font-weight: 800; padding: 3px 6px; border-radius: 6px; }
+    .grammar-level-name { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .grammar-arrow { width: 16px; height: 16px; stroke: var(--text-muted); stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s ease; }
+    .grammar-level-card.open .grammar-arrow { transform: rotate(180deg); stroke: var(--primary); }
+    .grammar-level-content { max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: var(--bg); border-top: 0px solid var(--border); }
+    .grammar-level-card.open .grammar-level-content { max-height: 2000px; border-top: 1px solid var(--border); padding: 12px 16px; }
+    .grammar-item { background: var(--card-bg); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border); }
+    .grammar-item-title { font-weight: 700; font-size: 0.85rem; color: var(--primary); margin-bottom: 4px; }
+    .grammar-item-desc { font-size: 0.8rem; color: var(--text); line-height: 1.4; margin-bottom: 4px; }
+    .grammar-item-ex { font-style: italic; font-size: 0.78rem; color: var(--text-muted); background: var(--bg); padding: 6px 10px; border-radius: 6px; border-left: 3px solid var(--primary); }
+
+    .quiz-card { background: var(--card-bg); padding: 18px; border-radius: var(--radius-lg); border: 1px solid var(--border); position: relative; box-shadow: var(--shadow-sm); transition: var(--transition); }
+    .quiz-question { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; line-height: 1.4; padding-right: 30px; color: var(--text); }
+    .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+    .option-btn { background: var(--bg); color: var(--text); border: 2px solid transparent; padding: 12px; text-align: left; border-radius: 10px; font-size: 0.9rem; font-weight: 600; box-shadow: none; transition: var(--transition); }
+    .option-btn.correct { background: var(--success); color: white; border-color: var(--success); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2); }
+    .option-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2); }
+    .quiz-explanation { display: none; margin-top: 14px; padding: 12px; background: var(--primary-light); border-radius: 10px; font-size: 0.85rem; color: var(--text); border: 1px solid rgba(99, 102, 241, 0.2); animation: fadeSlideUp 0.3s ease; }
+    .quiz-q-tr { font-weight: 700; margin-bottom: 4px; color: var(--primary); }
+    
+    .progress-wrapper-lg { background: var(--card-bg); padding: 18px; border-radius: var(--radius-lg); border: 1px solid var(--border); box-shadow: var(--shadow-sm); margin-bottom: 14px; transition: var(--transition); position: relative; overflow: hidden;}
+    .progress-header-lg { display: flex; justify-content: space-between; font-weight: 800; font-size: 1rem; margin-bottom: 12px; color: var(--text); align-items: center;}
+    .progress-bar-bg-lg { background: var(--bg); height: 12px; border-radius: 8px; overflow: hidden; position: relative; border: 1px solid var(--border); }
+    
+    .stats-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 14px; }
+    .stat-card { background: var(--card-bg); border-radius: var(--radius-md); padding: 16px 14px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); transition: var(--transition); }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--primary-light); }
+    .stat-info { display: flex; flex-direction: column; align-items: flex-start; }
+    .stat-value { font-size: 2rem; font-weight: 800; color: var(--primary); letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+    .stat-label { font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--primary-light); color: var(--primary); border-radius: 10px; }
+    .stat-icon svg { width: 22px; height: 22px; stroke-width: 2; stroke: currentColor; fill: none; }
+
+    .reset-progress-card { background: var(--card-bg); border-radius: var(--radius-md); padding: 18px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 12px; transition: var(--transition); }
+    .reset-header { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 0.95rem; color: var(--danger); }
+    .reset-header svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .btn-danger-custom { background: var(--danger); color: white; border: none; border-radius: 12px; padding: 10px 16px; font-size: 0.9rem; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); transition: var(--transition); height: 42px;}
+    .btn-danger-custom:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .edit-goal-btn { background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 8px; box-shadow: var(--shadow-sm); display: inline-flex; align-items: center; justify-content: center; margin-left: 8px; transition: var(--transition); }
+    .edit-goal-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3); }
+    .edit-goal-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .goal-reached-msg { text-align: center; margin-top: 12px; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; transition: var(--transition); }
+    .goal-reached-msg.success { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(16, 185, 129, 0.1)); color: var(--gold); border: 1px solid rgba(245, 158, 11, 0.2); }
+    .goal-reached-msg.pending { background: transparent; color: var(--text-muted); border: 1px solid transparent; }
+
+    /* LÜKS MODALLAR */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: var(--transition); }
+    .modal-overlay.active { opacity: 1; visibility: visible; }
+    .modal-box { background: var(--card-bg); width: 85%; max-width: 360px; border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); transform: scale(0.9); opacity: 0; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+    .modal-overlay.active .modal-box { transform: scale(1); opacity: 1; }
+    
+    .modal-title { font-size: 1.2rem; font-weight: 800; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; }
+    .modal-desc { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5; text-align: center; }
+    .modal-input { width: 100%; border: 2px solid var(--border); border-radius: 12px; padding: 12px; font-size: 1.05rem; font-weight: 600; color: var(--text); background: var(--bg); outline: none; margin-bottom: 16px; transition: var(--transition); }
+    .modal-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); background: var(--card-bg); }
+    
+    .modal-actions { display: flex; gap: 8px; margin-top: auto; }
+    .modal-actions button { flex: 1; padding: 12px; font-size: 0.95rem; border-radius: 12px; justify-content: center; font-weight: 700; border: none; cursor: pointer; transition: var(--transition); }
+    .btn-cancel { background: var(--bg); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+    .btn-cancel:hover { background: var(--border); }
+
+    /* Ayarlar Menüsü Bileşenleri */
+    .sm-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 14px; border-radius: 14px; border: 1px solid var(--border); margin-bottom: 12px; }
+    .sm-label { display: flex; flex-direction: column; gap: 4px; flex: 1; text-align: left; }
+    .sm-label-title { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .toggle-switch { width: 48px; height: 26px; background: var(--border); border-radius: 13px; position: relative; cursor: pointer; transition: background 0.3s ease; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); flex-shrink: 0; }
+    .toggle-switch.active { background: var(--success); }
+    .toggle-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; background: white; border-radius: 50%; transition: transform 0.3s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+    .toggle-switch.active::after { transform: translateX(22px); }
+
+    /* Kişisel Kelime Listesi */
+    .custom-word-list { max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; padding-right: 4px; }
+    .custom-word-list::-webkit-scrollbar { width: 4px; }
+    .custom-word-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    .cw-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg); border: 1px solid var(--border); padding: 10px 12px; border-radius: 12px; }
+    .cw-text { display: flex; flex-direction: column; text-align: left; }
+    .cw-en { font-weight: 700; font-size: 0.95rem; color: var(--primary); }
+    .cw-tr { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+    .cw-del { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: none; padding: 8px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+    .cw-del:hover { background: var(--danger); color: white; transform: scale(1.05); }
+    .cw-del svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top: 3px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 14px auto; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    nav { background: var(--card-bg); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 8px 6px calc(6px + env(safe-area-inset-bottom)) 6px; position: relative; z-index: 100; transition: var(--transition); flex-shrink: 0; }
+    .nav-btn { background: transparent; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; font-size: 0.65rem; gap: 3px; padding: 4px 2px; flex: 1; border-radius: 10px; box-shadow: none; transition: var(--transition); }
+    .nav-btn:hover { color: var(--primary); }
+    .nav-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.2s ease, stroke-width 0.2s ease; }
+    .nav-btn.active { color: var(--primary); font-weight: 700; }
+    .nav-btn.active svg { transform: translateY(-2px); stroke-width: 2.5; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="">
+
+  <div class="modal-overlay" id="goal-modal">
+    <div class="modal-box" style="text-align: center;">
+      <div class="modal-title">Günlük Hedef</div>
+      <div class="modal-desc">Günde kaç yeni kelime öğrenmek istiyorsun? Kendine meydan oku!</div>
+      <input type="number" id="goal-input" class="modal-input" min="1" max="1000" placeholder="Örn: 20" style="color:var(--primary); text-align:center;">
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeGoalModal()">İptal</button>
+        <button onclick="saveGoal()" style="background:var(--primary); color:white;">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="custom-alert-modal">
+    <div class="modal-box" style="text-align: center;">
+      <div id="modal-icon-container"></div>
+      <div class="modal-title" id="custom-alert-title">Bilgilendirme</div>
+      <div class="modal-desc" id="custom-alert-text">Mesaj buraya gelecek...</div>
+      <div class="modal-actions" id="modal-actions-container">
+        <button onclick="closeCustomAlert()" style="width: 100%; background:var(--primary); color:white;">Tamam</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="add-word-modal">
+    <div class="modal-box" style="text-align: center;">
+      <div class="modal-title" style="margin-bottom: 12px; color: var(--primary);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><path d="M12 5v14M5 12h14"/></svg>
+        Kelime Ekle
+      </div>
+      <div class="modal-desc" style="margin-bottom:16px;">Kendi desteni oluştur. Eklediğin kelimeler havuzda 'Kişisel' seviyesiyle görünür.</div>
+      <input type="text" id="cw-en" class="modal-input" placeholder="İngilizce (Örn: Authentic)" autocomplete="off" style="text-align:left;" />
+      <input type="text" id="cw-tr" class="modal-input" placeholder="Türkçesi (Örn: Özgün)" autocomplete="off" style="text-align:left;" />
+      <input type="text" id="cw-ex" class="modal-input" placeholder="Örnek Cümle (İsteğe bağlı)" autocomplete="off" style="text-align:left;" />
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeAddWordModal()">İptal</button>
+        <button onclick="saveCustomWord()" style="background:var(--primary); color:white;">Ekle</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="card-settings-modal">
+    <div class="modal-box">
+      <div class="modal-title" style="margin-bottom: 16px;">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        Kart Ayarları
+      </div>
+
+      <div class="sm-row">
+        <div class="sm-label">
+          <span class="sm-label-title">Seviye Seç</span>
+        </div>
+        <select class="premium-select" id="setting-level" onchange="saveAndApplySettings(true)" style="max-width: 140px; padding:6px 28px 6px 10px; font-size:0.85rem;">
+          <option value="All">Tümü</option>
+          <option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option>
+          <option value="B2">B2</option><option value="C1">C1</option><option value="Kişisel">Kişisel</option>
+        </select>
+      </div>
+
+      <div class="sm-row">
+        <div class="sm-label">
+          <span class="sm-label-title">Baş Harf</span>
+        </div>
+        <select class="premium-select" id="setting-letter" onchange="saveAndApplySettings(true)" style="max-width: 140px; padding:6px 28px 6px 10px; font-size:0.85rem;">
+          <option value="All">Tümü</option>
+          <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option><option value="M">M</option><option value="N">N</option><option value="O">O</option><option value="P">P</option><option value="Q">Q</option><option value="R">R</option><option value="S">S</option><option value="T">T</option><option value="U">U</option><option value="V">V</option><option value="W">W</option><option value="X">X</option><option value="Y">Y</option><option value="Z">Z</option>
+        </select>
+      </div>
+
+      <div class="sm-row" style="margin-bottom: 16px;">
+        <div class="sm-label">
+          <span class="sm-label-title">Rastgele Karıştır</span>
+        </div>
+        <div class="toggle-switch" id="setting-random" onclick="toggleRandomSetting()"></div>
+      </div>
+
+      <button style="width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); padding:12px; margin-bottom:10px; border-radius:12px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm);" onclick="openManageWordsModal()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        Eklediğim Kelimeler
+      </button>
+
+      <button style="width:100%; background:var(--card-bg); border:1px solid var(--danger); color:var(--danger); padding:12px; border-radius:12px; font-weight:700; margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm);" onclick="confirmResetCardIndex()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+        Gösterimi Başa Sar
+      </button>
+
+      <div class="modal-actions" style="margin-top: 0;">
+        <button onclick="closeCardSettings()" style="width:100%; background:var(--primary); color:white;">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="manage-words-modal">
+    <div class="modal-box" style="max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-title" style="margin-bottom: 12px; color: var(--text);">Eklediğim Kelimeler</div>
+      <input type="text" id="cw-search" class="modal-input" placeholder="Listede kelime ara..." oninput="renderCustomWordsList()" style="margin-bottom: 12px; text-align: left;">
+      <div class="custom-word-list" id="custom-word-list" style="flex: 1; overflow-y: auto; min-height: 150px;"></div>
+      <div class="modal-actions" style="margin-top: 16px;">
+        <button class="btn-cancel" onclick="closeManageWordsModal()" style="width:100%;">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="splash-screen">
+    <div class="splash-logo-container">
+      <svg class="splash-logo-svg" width="110" height="110" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M55 60C55 48.9543 63.9543 40 75 40H125C136.046 40 145 48.9543 145 60V110C145 121.046 136.046 130 125 130H95L70 150V130H75C63.9543 130 55 121.046 55 110V60Z" fill="#18181b" stroke="#27272a" stroke-width="2"/>
+        <path d="M85 102L100 68L115 102" stroke="#818cf8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M90 92H110" stroke="#818cf8" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="125" cy="65" r="5" fill="#10b981" filter="drop-shadow(0px 0px 8px rgba(16, 185, 129, 0.9))"/>
+      </svg>
+      <div class="splash-title">LingoMaster</div>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-logo-title">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M55 60C55 48.9543 63.9543 40 75 40H125C136.046 40 145 48.9543 145 60V110C145 121.046 136.046 130 125 130H95L70 150V130H75C63.9543 130 55 121.046 55 110V60Z" fill="#18181b" stroke="#27272a" stroke-width="2"/>
+        <path d="M85 102L100 68L115 102" stroke="#818cf8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M90 92H110" stroke="#818cf8" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="125" cy="65" r="5" fill="#10b981" filter="drop-shadow(0px 0px 8px rgba(16, 185, 129, 0.9))"/>
+      </svg>
+      <h1>LingoMaster</h1>
+    </div>
+    <div class="header-actions">
+      <span class="streak-badge">
+        <svg class="premium-flame" viewBox="0 0 24 24">
+          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
+        </svg>
+        <span id="streak-text">0 Gün</span>
+      </span>
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Temayı Değiştir">
+        <svg id="theme-icon" viewBox="0 0 24 24">
+          <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section id="vocab-view" class="view active">
+      <div class="vocab-top-bar">
+        <div class="vocab-status-badges">
+          <div class="vocab-status-badge" id="badge-level">
+            <svg viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 14v4"></path></svg>
+            Tüm Seviyeler
+          </div>
+          <div class="vocab-status-badge" id="badge-letter">
+            <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+            A-Z
+          </div>
+        </div>
+        <div class="vocab-actions-right">
+          <button class="vocab-icon-btn" onclick="openAddWordModal()" title="Kişisel Kelime Ekle">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="vocab-icon-btn" onclick="openCardSettings()" title="Kart Ayarları">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="mini-progress-container" onclick="switchTab('stats', document.getElementById('nav-stats'))">
+        <div class="mini-progress-header">
+          <span>Günlük Hedef</span>
+          <span id="mini-progress-text">0 / 20</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="mini-progress-fill"></div>
+        </div>
+      </div>
+
+      <div id="empty-msg" style="display:none; text-align:center; color:var(--text-muted); margin-top:20px; font-weight:500;">Bu kriterlere uygun kelime bulunamadı veya hepsi öğrenildi.</div>
+      
+      <div id="card-area">
+        <div class="swipe-hint-container">
+          <span class="swipe-hint danger">
+            <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Öğrenmedim
+          </span>
+          <span class="swipe-hint-divider"></span>
+          <span class="swipe-hint success">
+            Öğrendim <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </span>
+        </div>
+
+        <div class="card-container" id="card-container">
+          <div class="card" id="v-card" onclick="toggleCardFlip()">
+            <span class="level-badge card-level-badge" id="v-level">-</span>
+            <div class="word" id="v-word">Yükleniyor...</div>
+            <div class="phonetic" id="v-phonetic"></div>
+            
+            <div class="meaning" id="v-meaning" style="display:none;"></div>
+            <div class="example-container" id="v-example-box">
+              <p class="example" id="v-example"></p>
+              <p class="example-tr" id="v-example-tr"></p>
+            </div>
+            <div class="card-hint" id="v-hint">Çeviri için karta dokunun</div>
+          </div>
+        </div>
+        
+        <div class="card-actions">
+          <button class="secondary" onclick="playAudio()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path></svg>
+            Dinle
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="history-view" class="view">
+      <div class="filter-container-premium">
+        <label for="history-level-select">Filtre:</label>
+        <select class="premium-select" id="history-level-select" onchange="renderHistory()" style="max-width: 140px; padding:6px 28px 6px 10px; font-size:0.85rem;">
+          <option value="All">Tüm Seviyeler</option>
+          <option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option>
+          <option value="B2">B2</option><option value="C1">C1</option><option value="Kişisel">Kişisel</option>
+        </select>
+      </div>
+      <input type="text" id="history-search" class="search-input" placeholder="Kelime ara (İngilizce veya Türkçe)..." oninput="renderHistory()">
+      <div class="history-tabs">
+        <button class="history-tab active" onclick="switchHistoryTab('learned')">Öğrendiklerim</button>
+        <button class="history-tab" onclick="switchHistoryTab('learning')">Öğrenmediklerim</button>
+      </div>
+      <button onclick="startListQuiz()" style="width: 100%; margin-bottom: 14px;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+        Bu Listede Pratik Yap
+      </button>
+      <div id="history-empty" style="display:none; text-align:center; color:var(--text-muted); margin-top:20px;">Bu liste şu an boş veya aranan kelime bulunamadı.</div>
+      <div id="history-list"></div>
+    </section>
+
+    <section id="grammar-view" class="view">
+      <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-bottom:12px; font-weight: 500;">İstediğiniz seviyeye tıklayarak gramer kurallarını inceleyebilirsiniz.</p>
+      <div class="grammar-level-card">
+        <div class="grammar-level-header" onclick="toggleGrammarLevel(this)">
+          <div class="grammar-level-title-wrapper">
+            <span class="grammar-level-tag">A1</span>
+            <span class="grammar-level-name">Başlangıç Düzeyi</span>
+          </div>
+          <svg class="grammar-arrow" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="grammar-level-content">
+          <div class="grammar-item">
+            <div class="grammar-item-title">To Be Fiili (Am, Is, Are)</div>
+            <div class="grammar-item-desc">İsim cümleleri kurarken kullanılır.</div>
+            <div class="grammar-item-ex">"I <b>am</b> a student."</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="quiz-view" class="view">
+      <h3 id="quiz-mode-title" style="margin-bottom: 14px; color: var(--primary); text-align: center; font-weight: 800; font-size: 1.15rem;">Genel Alıştırma</h3>
+      <div class="quiz-card">
+        <span class="level-badge card-level-badge" id="quiz-level">-</span>
+        <div class="quiz-question" id="quiz-q">...</div>
+        <div class="quiz-options" id="quiz-opts"></div>
+        <div class="quiz-explanation" id="quiz-explanation">
+          <div class="quiz-q-tr" id="quiz-q-tr"></div>
+          <div class="quiz-exp" id="quiz-exp"></div>
+        </div>
+      </div>
+      <div style="margin-top: 16px; text-align: center;">
+        <button id="quiz-next" style="display:none; width: 100%;" onclick="loadNextQuiz()">Sonraki Soru</button>
+      </div>
+    </section>
+
+    <section id="stats-view" class="view">
+      <h3 style="margin-bottom: 12px; color: var(--primary); text-align: center; font-weight: 800; font-size: 1.15rem;">Çalışma İstatistikleri</h3>
+      
+      <div class="progress-wrapper-lg">
+        <div class="progress-header-lg">
+          <div style="display: flex; align-items: center;">
+            <span>Günlük Hedef</span>
+            <button class="edit-goal-btn" onclick="openGoalModal()" title="Hedefi Değiştir">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+          </div>
+          <span id="daily-progress-text">0 / 20</span>
+        </div>
+        <div class="progress-bar-bg-lg">
+          <div class="progress-bar-fill" id="daily-progress-fill"></div>
+        </div>
+        <div class="goal-reached-msg pending" id="daily-progress-msg">Kartları kaydırarak öğrenmeye devam et!</div>
+      </div>
+
+      <div class="filter-container-premium">
+        <label for="stats-level-select">Hangi Seviye:</label>
+        <select class="premium-select" id="stats-level-select" onchange="renderStats()" style="width: 150px;">
+          <option value="All">Tümü</option>
+          <option value="A1">A1 (Başlangıç)</option>
+          <option value="A2">A2 (Temel)</option>
+          <option value="B1">B1 (Orta)</option>
+          <option value="B2">B2 (İyi)</option>
+          <option value="C1">C1 (İleri)</option>
+          <option value="Kişisel">Kişisel (Benim)</option>
+        </select>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-value" id="stat-total-learned">0</span>
+            <span class="stat-label">Bu Seviyede Öğrenilen</span>
+          </div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-info">
+            <span class="stat-value" id="stat-percent-learned">%0</span>
+            <span class="stat-label">Bu Seviyeyi Öğrenme Oranı</span>
+          </div>
+          <div class="stat-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></div>
+        </div>
+      </div>
+
+      <div class="reset-progress-card">
+        <div class="reset-header">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          İlerlemeyi Sıfırla
+        </div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;">
+          Seçtiğiniz seviyedeki öğrenilen kelime hafızasını sıfırlayarak tekrar öğrenilmemiş duruma getirin.
+        </div>
+        <div class="reset-row">
+          <select id="reset-level-select" class="premium-select" style="flex:1;">
+            <option value="All">Tüm Seviyeler</option>
+            <option value="A1">A1 Seviyesi</option>
+            <option value="A2">A2 Seviyesi</option>
+            <option value="B1">B1 Seviyesi</option>
+            <option value="B2">B2 Seviyesi</option>
+            <option value="C1">C1 Seviyesi</option>
+            <option value="Kişisel">Kişisel Seviyesi</option>
+          </select>
+          <button class="btn-danger-custom" onclick="confirmResetProgress()">Sıfırla</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav>
+    <button class="nav-btn active" id="nav-vocab" onclick="switchTab('vocab', this)"><svg viewBox="0 0 24 24"><path d="M4 6h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path><path d="M8 2h12a2 2 0 0 1 2 2v10"></path></svg> Kartlar</button>
+    <button class="nav-btn" id="nav-history" onclick="switchTab('history', this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> Geçmiş</button>
+    <button class="nav-btn" id="nav-grammar" onclick="switchTab('grammar', this)"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg> Gramer</button>
+    <button class="nav-btn" id="nav-quiz" onclick="switchTab('quiz', this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg> Alıştırma</button>
+    <button class="nav-btn" id="nav-stats" onclick="switchTab('stats', this)"><svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"></path></svg> İstatistik</button>
+  </nav>
+
+  <script src="words.js"></script>
+
+  <script>
+    function setupCustomSelects() {
+        document.querySelectorAll('select').forEach(nativeSelect => {
+            if (nativeSelect.nextElementSibling && nativeSelect.nextElementSibling.classList.contains('custom-select-container')) {
+                return;
+            }
+            
+            nativeSelect.classList.add('premium-select-hidden');
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'custom-select-container';
+            if (nativeSelect.style.maxWidth) wrapper.style.maxWidth = nativeSelect.style.maxWidth;
+            if (nativeSelect.style.width) wrapper.style.width = nativeSelect.style.width;
+            if (nativeSelect.style.flex) wrapper.style.flex = nativeSelect.style.flex;
+            
+            const trigger = document.createElement('div');
+            trigger.className = 'custom-select-trigger';
+            
+            const triggerText = document.createElement('span');
+            const selectedOpt = nativeSelect.options[nativeSelect.selectedIndex];
+            triggerText.textContent = selectedOpt ? selectedOpt.text : '';
+            
+            const triggerIcon = document.createElement('div');
+            triggerIcon.className = 'custom-select-icon';
+            triggerIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+            
+            trigger.appendChild(triggerText);
+            trigger.appendChild(triggerIcon);
+            
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'custom-select-options';
+            
+            Array.from(nativeSelect.options).forEach((option) => {
+                const optDiv = document.createElement('div');
+                optDiv.className = 'custom-select-option';
+                if (option.selected) optDiv.classList.add('selected');
+                optDiv.textContent = option.text;
+                optDiv.dataset.value = option.value;
+                
+                optDiv.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    optionsContainer.querySelectorAll('.custom-select-option').forEach(el => el.classList.remove('selected'));
+                    optDiv.classList.add('selected');
+                    triggerText.textContent = option.text;
+                    nativeSelect.value = option.value;
+                    wrapper.classList.remove('open');
+                    
+                    const event = new Event('change');
+                    nativeSelect.dispatchEvent(event);
+                });
+                optionsContainer.appendChild(optDiv);
+            });
+            
+            wrapper.appendChild(trigger);
+            wrapper.appendChild(optionsContainer);
+            nativeSelect.parentNode.insertBefore(wrapper, nativeSelect.nextSibling);
+            
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-container').forEach(c => {
+                    if (c !== wrapper) c.classList.remove('open');
+                });
+                wrapper.classList.toggle('open');
+            });
+        });
+        
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-container').forEach(c => c.classList.remove('open'));
+        });
+    }
+
+    function updateCustomSelectsUI() {
+        document.querySelectorAll('select').forEach(nativeSelect => {
+            const wrapper = nativeSelect.nextElementSibling;
+            if (wrapper && wrapper.classList.contains('custom-select-container')) {
+                const selectedOpt = nativeSelect.options[nativeSelect.selectedIndex];
+                if (selectedOpt) {
+                    wrapper.querySelector('.custom-select-trigger span').textContent = selectedOpt.text;
+                    wrapper.querySelectorAll('.custom-select-option').forEach(optDiv => {
+                        optDiv.classList.remove('selected');
+                        if (optDiv.dataset.value === selectedOpt.value) optDiv.classList.add('selected');
+                    });
+                }
+            }
+        });
+    }
+
+    let supabaseClient = null;
+    if (typeof supabase !== 'undefined') {
+        try {
+            const { createClient } = supabase; 
+            const supabaseUrl = 'https://gykppuisvpgspkuumxnl.supabase.co'; 
+            const supabaseKey = 'sb_publishable_chpPTiSYA2NAQyBKjtpRRQ_VecphQ3v'; 
+            supabaseClient = createClient(supabaseUrl, supabaseKey);
+        } catch (e) {
+            console.log('Supabase başlatılamadı', e);
+        }
+    }
+
+    let cardSettings = JSON.parse(localStorage.getItem('lingo_card_settings')) || { level: 'All', letter: 'All', random: false };
+    let customWords = JSON.parse(localStorage.getItem('lingo_custom_words')) || [];
+    let currentWords = [];
+    let currentWordIdx = 0;
+    let isFlipped = false;
+    let userMemory = JSON.parse(localStorage.getItem('lingo_memory')) || { learned: [], learning: [] };
+    
+    function getFullWordPool() {
+      let baseWords = [];
+      if (window.updatedAllWords) { baseWords = window.updatedAllWords; } 
+      else if (typeof allWords !== 'undefined') { baseWords = allWords; } 
+      else {
+         const stored = localStorage.getItem('words_data');
+         if (stored) baseWords = JSON.parse(stored);
+      }
+      return baseWords.filter(w => w.level !== 'Kişisel').concat(customWords);
+    }
+
+    function openAddWordModal() {
+      document.getElementById('cw-en').value = ''; document.getElementById('cw-tr').value = ''; document.getElementById('cw-ex').value = '';
+      document.getElementById('add-word-modal').classList.add('active');
+    }
+    function closeAddWordModal() { document.getElementById('add-word-modal').classList.remove('active'); }
+
+    function saveCustomWord() {
+      const en = document.getElementById('cw-en').value.trim();
+      const tr = document.getElementById('cw-tr').value.trim();
+      const ex = document.getElementById('cw-ex').value.trim();
+      
+      if(!en || !tr) { showCustomAlert("Hata", "İngilizce ve Türkçe alanlar zorunludur.", "info"); return; }
+      
+      const newWord = { id: 'cw_' + Date.now(), en: en, tr: tr, ph: '', ex: ex, ex_tr: '', level: 'Kişisel' };
+      customWords.push(newWord);
+      localStorage.setItem('lingo_custom_words', JSON.stringify(customWords));
+      
+      closeAddWordModal();
+      showCustomAlert("Başarılı", `'${en}' kelimesi Kişisel destenize eklendi.`, "success");
+      saveAndApplySettings(true);
+    }
+
+    function openCardSettings() {
+      document.getElementById('setting-level').value = cardSettings.level;
+      document.getElementById('setting-letter').value = cardSettings.letter;
+      const toggle = document.getElementById('setting-random');
+      if (cardSettings.random) toggle.classList.add('active'); else toggle.classList.remove('active');
+      
+      updateCustomSelectsUI();
+      document.getElementById('card-settings-modal').classList.add('active');
+    }
+    function closeCardSettings() { document.getElementById('card-settings-modal').classList.remove('active'); }
+
+    function toggleRandomSetting() {
+      const toggle = document.getElementById('setting-random');
+      toggle.classList.toggle('active');
+      cardSettings.random = toggle.classList.contains('active');
+      saveAndApplySettings(true);
+    }
+
+    function openManageWordsModal() {
+      closeCardSettings();
+      document.getElementById('cw-search').value = ''; 
+      renderCustomWordsList();
+      document.getElementById('manage-words-modal').classList.add('active');
+    }
+    
+    function closeManageWordsModal() { document.getElementById('manage-words-modal').classList.remove('active'); }
+
+    function renderCustomWordsList() {
+      const listContainer = document.getElementById('custom-word-list');
+      const searchQuery = document.getElementById('cw-search').value.toLowerCase().trim();
+      listContainer.innerHTML = '';
+      
+      let filtered = customWords;
+      if (searchQuery !== '') {
+        filtered = customWords.filter(w => {
+          const enStr = w.en ? String(w.en).toLowerCase() : '';
+          const trStr = w.tr ? String(w.tr).toLowerCase() : '';
+          return enStr.includes(searchQuery) || trStr.includes(searchQuery);
+        });
+      }
+
+      if(filtered.length === 0) {
+        listContainer.innerHTML = '<div style="text-align:center; color:var(--text-muted); font-size:0.85rem; padding: 20px;">Kelime bulunamadı.</div>';
+        return;
+      }
+
+      filtered.forEach(w => {
+        listContainer.innerHTML += `
+          <div class="cw-item">
+            <div class="cw-text">
+              <span class="cw-en">${w.en}</span>
+              <span class="cw-tr">${w.tr}</span>
+            </div>
+            <button class="cw-del" onclick="deleteCustomWord('${w.id}')">
+              <svg viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+        `;
+      });
+    }
+
+    function deleteCustomWord(id) {
+      customWords = customWords.filter(w => w.id !== id);
+      localStorage.setItem('lingo_custom_words', JSON.stringify(customWords));
+      
+      userMemory.learned = userMemory.learned.filter(w => w.id !== id);
+      userMemory.learning = userMemory.learning.filter(w => w.id !== id);
+      localStorage.setItem('lingo_memory', JSON.stringify(userMemory));
+
+      renderCustomWordsList(); 
+      buildCardPool(false); 
+      renderStats();
+    }
+
+    function confirmResetCardIndex() {
+      document.getElementById('custom-alert-title').textContent = "Kartları Başa Sar";
+      document.getElementById('custom-alert-text').textContent = "Mevcut filtrelere göre tüm kelimeler tekrar sıfırlanıp başa sarılacak. Emin misiniz?";
+      const iconContainer = document.getElementById('modal-icon-container');
+      const actionsContainer = document.getElementById('modal-actions-container');
+
+      iconContainer.innerHTML = `<div style="width:52px; height:52px; background:rgba(239, 68, 68, 0.15); color:var(--danger); border-radius:18px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg></div>`;
+      actionsContainer.innerHTML = `
+        <button class="btn-cancel" onclick="closeCustomAlert()" style="flex:1; padding:10px; border-radius:10px;">İptal</button>
+        <button onclick="executeResetCardIndex()" style="flex:1; background:var(--danger); padding:10px; border-radius:10px; color:white; font-weight:700;">Başa Sar</button>
+      `;
+      closeCardSettings();
+      document.getElementById('custom-alert-modal').classList.add('active');
+    }
+
+    function executeResetCardIndex() {
+      saveAndApplySettings(true); closeCustomAlert(); showCustomAlert("Başarılı", "Kart gösterimi başarıyla başa sarıldı.", "info");
+    }
+
+    function saveAndApplySettings(resetIndex = false) {
+      cardSettings.level = document.getElementById('setting-level').value;
+      cardSettings.letter = document.getElementById('setting-letter').value;
+      localStorage.setItem('lingo_card_settings', JSON.stringify(cardSettings));
+      
+      const badgeLevel = document.getElementById('badge-level');
+      badgeLevel.innerHTML = `<svg viewBox="0 0 24 24"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"></path><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"></path><path d="M18 14v4"></path></svg> ` + (cardSettings.level === 'All' ? 'Tüm Seviyeler' : cardSettings.level);
+                             
+      const badgeLetter = document.getElementById('badge-letter');
+      badgeLetter.innerHTML = `<svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg> ` + (cardSettings.letter === 'All' ? 'A-Z' : cardSettings.letter);
+
+      buildCardPool(resetIndex);
+    }
+
+    function buildCardPool(resetIndex = false) {
+      let poolSource = getFullWordPool();
+
+      let pool = poolSource.filter(w => {
+        let isLearned = userMemory.learned.some(memW => memW.id === w.id);
+        let matchLevel = (cardSettings.level === 'All') || (w.level === cardSettings.level);
+        let wEn = w.en ? String(w.en) : "";
+        let matchLetter = (cardSettings.letter === 'All') || (wEn.charAt(0).toUpperCase() === cardSettings.letter);
+        return matchLevel && matchLetter && !isLearned;
+      });
+
+      if (pool.length === 0) {
+        document.getElementById('card-area').style.display = 'none';
+        document.getElementById('empty-msg').style.display = 'block';
+        currentWords = [];
+        return;
+      }
+
+      if (cardSettings.random && resetIndex) {
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+      }
+
+      currentWords = pool;
+
+      if (resetIndex) {
+        currentWordIdx = 0;
+        localStorage.setItem('lingo_card_idx', 0);
+      } else {
+        currentWordIdx = parseInt(localStorage.getItem('lingo_card_idx')) || 0;
+        if (currentWordIdx >= currentWords.length) currentWordIdx = 0;
+      }
+      
+      document.getElementById('card-area').style.display = 'flex';
+      document.getElementById('empty-msg').style.display = 'none';
+      renderWord();
+    }
+
+    function handleSwipeAction(status) {
+      if (currentWords.length === 0) return;
+      const wordObj = currentWords[currentWordIdx];
+      
+      userMemory.learned = userMemory.learned.filter(w => w.id !== wordObj.id);
+      userMemory.learning = userMemory.learning.filter(w => w.id !== wordObj.id);
+      userMemory[status].unshift(wordObj);
+      localStorage.setItem('lingo_memory', JSON.stringify(userMemory));
+      
+      if (status === 'learned') {
+        updateDailyStats(true);
+        currentWords.splice(currentWordIdx, 1);
+        if(currentWords.length === 0) {
+          buildCardPool(false);
+          return;
+        }
+        if(currentWordIdx >= currentWords.length) currentWordIdx = 0;
+      } else {
+        renderStats(); 
+        currentWordIdx = (currentWordIdx + 1) % currentWords.length;
+      }
+
+      setTimeout(() => {
+        localStorage.setItem('lingo_card_idx', currentWordIdx);
+        renderWord();
+      }, 300);
+    }
+
+    function renderWord() {
+      if (currentWords.length === 0) return;
+      const item = currentWords[currentWordIdx];
+      const card = document.getElementById('v-card');
+      card.style.transition = 'none'; card.style.transform = 'translateX(0) rotate(0deg)'; card.style.boxShadow = 'var(--shadow-lg)'; card.style.border = '1px solid var(--border)'; card.style.opacity = '1';
+      
+      document.getElementById('v-word').textContent = item.en; 
+      document.getElementById('v-phonetic').textContent = item.ph || '';
+      
+      document.getElementById('v-meaning').textContent = item.tr; document.getElementById('v-example').textContent = item.ex ? `"${item.ex}"` : ''; document.getElementById('v-example-tr').textContent = item.ex_tr ? `(${item.ex_tr})` : '';
+      
+      const levelBadge = document.getElementById('v-level'); levelBadge.textContent = item.level;
+      const colors = { A1: '#10b981', A2: '#3b82f6', B1: '#8b5cf6', B2: '#f59e0b', C1: '#ef4444', 'Kişisel': '#ec4899' };
+      levelBadge.style.backgroundColor = colors[item.level] || '#64748b';
+      
+      isFlipped = false; document.getElementById('v-meaning').style.display = 'none'; document.getElementById('v-example-box').style.display = 'none'; document.getElementById('v-hint').style.display = 'block';
+    }
+
+    const cardEl = document.getElementById('v-card');
+    let isDragging = false, startX = 0, currentTranslate = 0; const threshold = 100; 
+    cardEl.addEventListener('touchstart', touchStart, {passive: true}); cardEl.addEventListener('touchmove', touchMove, {passive: true}); cardEl.addEventListener('touchend', touchEnd); cardEl.addEventListener('mousedown', touchStart); cardEl.addEventListener('mousemove', touchMove); cardEl.addEventListener('mouseup', touchEnd); cardEl.addEventListener('mouseleave', () => { if(isDragging) touchEnd() });
+    
+    function touchStart(e) { if (e.target.closest('button')) return; isDragging = true; startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX; cardEl.style.transition = 'none'; }
+    function touchMove(e) {
+      if (!isDragging) return; const currentPosition = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX; currentTranslate = currentPosition - startX; cardEl.style.transform = `translateX(${currentTranslate}px) rotate(${currentTranslate * 0.04}deg)`;
+      if (currentTranslate > 30) { cardEl.style.boxShadow = '0 20px 40px 10px rgba(16, 185, 129, 0.25)'; cardEl.style.border = '2px solid var(--success)'; } 
+      else if (currentTranslate < -30) { cardEl.style.boxShadow = '0 20px 40px 10px rgba(239, 68, 68, 0.25)'; cardEl.style.border = '2px solid var(--danger)'; } 
+      else { cardEl.style.boxShadow = 'var(--shadow-lg)'; cardEl.style.border = '1px solid var(--border)'; }
+    }
+    
+    function touchEnd(e) {
+      if (!isDragging) return; isDragging = false;
+      if (Math.abs(currentTranslate) < 10) { cardEl.style.transform = 'translateX(0) rotate(0deg) scale(1)'; cardEl.style.border = '1px solid var(--border)'; currentTranslate = 0; return; }
+      cardEl.style.transition = 'transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.4s ease, border 0.4s ease';
+      if (currentTranslate > threshold) { cardEl.style.transform = `translateX(${window.innerWidth}px) rotate(15deg)`; cardEl.style.opacity = '0'; handleSwipeAction('learned'); } 
+      else if (currentTranslate < -threshold) { cardEl.style.transform = `translateX(-${window.innerWidth}px) rotate(-15deg)`; cardEl.style.opacity = '0'; handleSwipeAction('learning'); } 
+      else { cardEl.style.transform = 'translateX(0) rotate(0deg)'; cardEl.style.boxShadow = 'var(--shadow-lg)'; cardEl.style.border = '1px solid var(--border)'; }
+      currentTranslate = 0;
+    }
+
+    function toggleCardFlip() {
+      if (currentWords.length === 0) return; isFlipped = !isFlipped;
+      document.getElementById('v-meaning').style.display = isFlipped ? 'block' : 'none'; document.getElementById('v-example-box').style.display = isFlipped ? 'block' : 'none'; document.getElementById('v-hint').style.display = isFlipped ? 'none' : 'block';
+    }
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+    function playAudio() {
+      if (currentWords.length === 0) return; 
+      if (!('speechSynthesis' in window)) { showCustomAlert("Hata", "Tarayıcınız ses sentezini desteklemiyor.", "info"); return; }
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(currentWords[currentWordIdx].en); 
+      utterance.lang = 'en-US'; 
+      utterance.rate = 0.9;
+      utterance.pitch = 1.0;
+      
+      let voices = window.speechSynthesis.getVoices();
+      let enVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Google')); 
+      if (!enVoice) enVoice = voices.find(v => v.lang === 'en-US' || v.lang === 'en_US'); 
+      if (!enVoice) enVoice = voices.find(v => v.lang.startsWith('en')); 
+      
+      if (enVoice) utterance.voice = enVoice;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function showCustomAlert(title, message, iconType = 'info', isUpdating = false, onReload = null) {
+      document.getElementById('custom-alert-title').textContent = title; document.getElementById('custom-alert-text').textContent = message;
+      const iconContainer = document.getElementById('modal-icon-container'); const actionsContainer = document.getElementById('modal-actions-container');
+      if (isUpdating) { iconContainer.innerHTML = '<div class="spinner"></div>'; actionsContainer.innerHTML = ''; } else {
+        let svgIcon = '';
+        if (iconType === 'ui') { svgIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>'; }
+        else if (iconType === 'content') { svgIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>'; }
+        else if (iconType === 'success') { svgIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'; }
+        else if (iconType === 'danger') { svgIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>'; }
+        else { svgIcon = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'; }
+        iconContainer.innerHTML = `<div style="width:52px; height:52px; background:var(--primary-light); color:var(--primary); border-radius:18px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto; box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2);">${svgIcon}</div>`;
+        actionsContainer.innerHTML = `<button onclick="closeCustomAlert(); ${onReload ? 'location.reload(true);' : ''}" style="width: 100%; background:var(--primary); color:white;">Tamam</button>`;
+      }
+      document.getElementById('custom-alert-modal').classList.add('active');
+    }
+    function closeCustomAlert() { document.getElementById('custom-alert-modal').classList.remove('active'); }
+
+    function confirmResetProgress() {
+      const selectedLevel = document.getElementById('reset-level-select').value;
+      const levelText = selectedLevel === 'All' ? 'Tüm Seviyeler' : `${selectedLevel} Seviyesi`;
+      document.getElementById('custom-alert-title').textContent = "İlerlemeyi Sıfırla"; document.getElementById('custom-alert-text').textContent = `${levelText} için öğrenilen kelime hafızası sıfırlanacak. Emin misiniz?`;
+      const iconContainer = document.getElementById('modal-icon-container'); const actionsContainer = document.getElementById('modal-actions-container');
+      iconContainer.innerHTML = `<div style="width:52px; height:52px; background:rgba(239, 68, 68, 0.15); color:var(--danger); border-radius:18px; display:flex; align-items:center; justify-content:center; margin:0 auto 16px auto;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>`;
+      actionsContainer.innerHTML = `<button class="btn-cancel" onclick="closeCustomAlert()" style="flex:1; padding:10px; border-radius:10px;">İptal</button><button onclick="executeResetProgress('${selectedLevel}')" style="flex:1; background:var(--danger); padding:10px; border-radius:10px; color:white; font-weight:700;">Sıfırla</button>`;
+      document.getElementById('custom-alert-modal').classList.add('active');
+    }
+
+    function executeResetProgress(level) {
+      let poolSource = getFullWordPool();
+      let removedCount = 0;
+      if (level === 'All') { removedCount = userMemory.learned.length; userMemory.learned = []; } else {
+        const wordsToRemove = userMemory.learned.filter(savedW => { const original = poolSource.find(w => w.id === savedW.id); return original && original.level === level; }); removedCount = wordsToRemove.length;
+        const wordsToKeep = userMemory.learned.filter(savedW => { const original = poolSource.find(w => w.id === savedW.id); return original ? original.level !== level : true; }); userMemory.learned = wordsToKeep;
+      }
+      localStorage.setItem('lingo_memory', JSON.stringify(userMemory));
+      if (removedCount > 0) { let dStats = checkDailyStats(); if (dStats.learnedToday > 0) { dStats.learnedToday = Math.max(0, dStats.learnedToday - removedCount); localStorage.setItem('lingo_dailyStats', JSON.stringify(dStats)); } }
+      closeCustomAlert(); renderStats(); saveAndApplySettings(false); showCustomAlert("Başarılı", "Seçilen seviyedeki ilerlemeniz sıfırlandı.", 'success');
+    }
+
+    function updateStreak() {
+      const today = new Date().toISOString().split('T')[0]; let streakData = JSON.parse(localStorage.getItem('lingo_streak')) || { count: 0, lastDate: null };
+      if (streakData.lastDate !== today) { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); if (streakData.lastDate === yesterday.toISOString().split('T')[0]) streakData.count += 1; else streakData.count = 1; streakData.lastDate = today; localStorage.setItem('lingo_streak', JSON.stringify(streakData)); }
+      if (document.getElementById('streak-text')) document.getElementById('streak-text').textContent = streakData.count + ' Gün';
+    }
+
+    const CURRENT_UI_BUILD = '2026.10.05-v3';
+    function checkUIBuildVersion() {
+      const savedBuild = localStorage.getItem('lingo_ui_build');
+      if (savedBuild && savedBuild !== CURRENT_UI_BUILD) { showCustomAlert("Yeni Arayüz Sürümü", "LingoMaster sizin için geliştirildi! En yeni tasarım ve özellikler aktif edildi.", 'ui', false, true); }
+      localStorage.setItem('lingo_ui_build', CURRENT_UI_BUILD);
+    }
+
+    async function checkAndUpdateApp() {
+      if (!navigator.onLine || !supabaseClient) { return; }
+      try {
+        const { data: cloudSettings, error: settingsError } = await supabaseClient.from('app_settings').select('version').single();
+        if (settingsError) throw settingsError;
+        const cloudVersion = cloudSettings.version; const localVersion = parseInt(localStorage.getItem('app_version') || '0');
+        if (cloudVersion > localVersion) {
+          showCustomAlert("İçerik Güncellendi", "Buluttan en yeni kelimeler ve veriler indiriliyor...", 'content', true);
+          const { data: newWords, error: wordsError } = await supabaseClient.from('words').select('*'); if (wordsError) throw wordsError;
+          localStorage.setItem('words_data', JSON.stringify(newWords)); localStorage.setItem('app_version', cloudVersion.toString());
+          window.updatedAllWords = newWords;
+          setTimeout(() => showCustomAlert("İçerik Güncellendi", "Yeni kelime havuzu başarıyla yüklendi! Uygulama yeniden başlatılıyor.", 'content', false, true), 900);
+        }
+      } catch (error) { console.error(error); }
+    }
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+          const splash = document.getElementById('splash-screen');
+          if(splash) splash.classList.add('splash-fade-out');
+      }, 800);
+
+      try {
+          setupCustomSelects();
+          checkUIBuildVersion(); 
+          renderStats(); 
+          if(navigator.onLine) checkAndUpdateApp(); 
+          updateStreak(); 
+          
+          document.getElementById('setting-level').value = cardSettings.level;
+          document.getElementById('setting-letter').value = cardSettings.letter;
+          updateCustomSelectsUI();
+          
+          saveAndApplySettings(false);
+      } catch (e) {
+          console.error("Error:", e);
+          document.getElementById('card-area').style.display = 'flex';
+      }
+    });
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('lingo_theme') || 'light';
+      if (savedTheme === 'dark') { document.body.classList.add('dark-theme'); document.documentElement.classList.add('dark-theme'); updateThemeIcon(true); } 
+      else { document.body.classList.remove('dark-theme'); document.documentElement.classList.remove('dark-theme'); updateThemeIcon(false); }
+    }
+    
+    function toggleTheme() {
+      const isDark = document.body.classList.toggle('dark-theme'); document.documentElement.classList.toggle('dark-theme', isDark);
+      localStorage.setItem('lingo_theme', isDark ? 'dark' : 'light'); updateThemeIcon(isDark);
+    }
+
+    function updateThemeIcon(isDark) {
+      const icon = document.getElementById('theme-icon'); const metaTheme = document.getElementById('meta-theme-color'); const appleStatus = document.getElementById('apple-status-bar');
+      if (isDark) { icon.innerHTML = '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>'; if(metaTheme) metaTheme.setAttribute('content', '#09090b'); if(appleStatus) appleStatus.setAttribute('content', 'black-translucent'); } 
+      else { icon.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>'; if(metaTheme) metaTheme.setAttribute('content', '#f4f4f5'); if(appleStatus) appleStatus.setAttribute('content', 'default'); }
+    }
+    initTheme();
+
+    function openGoalModal() { document.getElementById('goal-input').value = checkDailyStats().goal; document.getElementById('goal-modal').classList.add('active'); }
+    function closeGoalModal() { document.getElementById('goal-modal').classList.remove('active'); }
+    function saveGoal() {
+      const inputVal = document.getElementById('goal-input').value;
+      if (inputVal && !isNaN(inputVal) && parseInt(inputVal) > 0) { let stats = checkDailyStats(); stats.goal = parseInt(inputVal); localStorage.setItem('lingo_dailyStats', JSON.stringify(stats)); renderStats(); closeGoalModal(); } 
+      else { showCustomAlert("Hata", "Lütfen geçerli bir sayı giriniz.", 'info'); }
+    }
+
+    function checkDailyStats() {
+      let stats = JSON.parse(localStorage.getItem('lingo_dailyStats')); const today = new Date().toISOString().split('T')[0];
+      if (!stats || stats.date !== today) { let savedGoal = stats && stats.goal ? stats.goal : 20; stats = { date: today, learnedToday: 0, goal: savedGoal }; localStorage.setItem('lingo_dailyStats', JSON.stringify(stats)); }
+      return stats;
+    }
+
+    function updateDailyStats(isLearned) { if (isLearned) { let stats = checkDailyStats(); stats.learnedToday++; localStorage.setItem('lingo_dailyStats', JSON.stringify(stats)); renderStats(); } }
+
+    function renderStats() {
+      const dStats = checkDailyStats(); const progressPercent = Math.min((dStats.learnedToday / dStats.goal) * 100, 100);
+      const lgFill = document.getElementById('daily-progress-fill'); if (lgFill) lgFill.style.width = `${progressPercent}%`;
+      const lgText = document.getElementById('daily-progress-text'); if (lgText) lgText.textContent = `${dStats.learnedToday} / ${dStats.goal}`;
+      const miniFill = document.getElementById('mini-progress-fill'); if (miniFill) miniFill.style.width = `${progressPercent}%`;
+      const miniText = document.getElementById('mini-progress-text'); if (miniText) miniText.textContent = `${dStats.learnedToday} / ${dStats.goal}`;
+      const msgEl = document.getElementById('daily-progress-msg');
+      if (msgEl) {
+        if (dStats.learnedToday >= dStats.goal) { msgEl.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg> Harika! Günlük hedefine ulaştın.`; msgEl.className = "goal-reached-msg success"; } 
+        else { msgEl.textContent = "Kartları kaydırarak öğrenmeye devam et!"; msgEl.className = "goal-reached-msg pending"; }
+      }
+      
+      const statsLevel = document.getElementById('stats-level-select') ? document.getElementById('stats-level-select').value : 'All';
+      let totalLearnedCount = 0, totalWordsInPool = 0;
+      let poolSource = getFullWordPool();
+      
+      if (poolSource.length > 0) {
+        if (statsLevel === 'All') { totalLearnedCount = userMemory.learned.length; totalWordsInPool = poolSource.length; } else {
+          totalLearnedCount = userMemory.learned.filter(w => { const original = poolSource.find(item => item.id === w.id); return original && original.level === statsLevel; }).length;
+          totalWordsInPool = poolSource.filter(w => w.level === statsLevel).length;
+        }
+      }
+      const elTotLearned = document.getElementById('stat-total-learned'); if (elTotLearned) elTotLearned.textContent = totalLearnedCount;
+      const elPercentLearned = document.getElementById('stat-percent-learned');
+      if (elPercentLearned && totalWordsInPool > 0) elPercentLearned.textContent = `%${Math.floor((totalLearnedCount / totalWordsInPool) * 100)}`; else if (elPercentLearned) elPercentLearned.textContent = `%0`;
+    }
+
+    let activeHistoryTab = 'learned';
+    function switchHistoryTab(tab) { activeHistoryTab = tab; document.querySelectorAll('.history-tab').forEach(t => t.classList.remove('active')); event.target.classList.add('active'); renderHistory(); }
+    
+    function renderHistory() {
+      const list = document.getElementById('history-list'); const emptyMsg = document.getElementById('history-empty'); list.innerHTML = '';
+      let poolSource = getFullWordPool();
+      let targetArray = userMemory[activeHistoryTab].map(savedWord => { const freshWord = poolSource.find(w => w.id === savedWord.id); return freshWord ? { ...savedWord, ...freshWord } : savedWord; });
+      const selectedHistoryLevel = document.getElementById('history-level-select').value;
+      if (selectedHistoryLevel !== 'All') targetArray = targetArray.filter(w => w.level === selectedHistoryLevel);
+      
+      const searchQuery = document.getElementById('history-search').value.toLowerCase().trim();
+      if (searchQuery !== '') {
+        targetArray = targetArray.filter(w => {
+          const enStr = w.en ? String(w.en).toLowerCase() : '';
+          const trStr = w.tr ? String(w.tr).toLowerCase() : '';
+          return enStr.includes(searchQuery) || trStr.includes(searchQuery);
+        });
+      }
+      
+      if (targetArray.length === 0) { list.style.display = 'none'; emptyMsg.style.display = 'block'; return; }
+      list.style.display = 'block'; emptyMsg.style.display = 'none';
+      const oppositeTab = activeHistoryTab === 'learned' ? 'learning' : 'learned'; const oppositeText = activeHistoryTab === 'learned' ? 'Öğrenmedim\'e Taşı' : 'Öğrendim\'e Taşı';
+      const btnColor = activeHistoryTab === 'learned' ? 'var(--danger)' : 'var(--success)';
+      const colors = { A1: '#10b981', A2: '#3b82f6', B1: '#8b5cf6', B2: '#f59e0b', C1: '#ef4444', 'Kişisel': '#ec4899' };
+      targetArray.forEach(w => {
+        const badgeColor = colors[w.level] || '#64748b';
+        list.innerHTML += `<div class="history-card"><div class="history-header"><span class="history-word">${w.en}</span><span class="level-badge" style="background-color: ${badgeColor}; box-shadow: none;">${w.level}</span></div><span class="history-pronunciation">${w.ph || ''}</span><span class="history-tr">${w.tr}</span><div class="history-actions"><button style="background:${btnColor}" onclick="moveWord('${w.id}', '${oppositeTab}')">⟲ ${oppositeText}</button></div></div>`;
+      });
+    }
+
+    function moveWord(id, newStatus) {
+      const oldStatus = newStatus === 'learned' ? 'learning' : 'learned'; const wordIndex = userMemory[oldStatus].findIndex(w => w.id === id || w.id == id);
+      if (wordIndex > -1) {
+        const wordObj = userMemory[oldStatus].splice(wordIndex, 1)[0];
+        userMemory[newStatus] = userMemory[newStatus].filter(w => w.id !== wordObj.id);
+        userMemory[newStatus].unshift(wordObj); localStorage.setItem('lingo_memory', JSON.stringify(userMemory)); renderHistory(); renderStats();
+      }
+    }
+
+    let isCustomQuiz = false; let customQuizIdx = 0; let generatedQuizzes = []; let currentQuizIdx = 0;
+    const generalQuizzes = [ { level: "B2", q: "He is _____ to move abroad because he loves his hometown.", q_tr: "Memleketini sevdiği için yurt dışına taşınmaya _____.", ans_tr: "isteksiz", opts: ["inevitable", "reluctant", "significant", "always"], ans: 1, exp: "'Reluctant' isteksiz anlamına gelir." } ];
+
+    function switchTab(viewId, element) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`${viewId}-view`).classList.add('active'); if(element) element.classList.add('active');
+      if (viewId === 'quiz') { isCustomQuiz = false; document.getElementById('quiz-mode-title').textContent = "Genel Alıştırma"; currentQuizIdx = 0; renderQuiz(); }
+      if (viewId === 'history') { document.getElementById('history-search').value = ''; renderHistory(); updateCustomSelectsUI(); }
+      if (viewId === 'stats') { renderStats(); updateCustomSelectsUI(); }
+    }
+
+    function toggleGrammarLevel(headerElement) { const card = headerElement.parentElement; const isOpen = card.classList.contains('open'); if (!isOpen) { card.classList.add('open'); } else { card.classList.remove('open'); } }
+
+    function startListQuiz() {
+      let poolSource = getFullWordPool();
+      let targetArray = userMemory[activeHistoryTab].map(savedWord => { const freshWord = poolSource.find(w => w.id === savedWord.id); return freshWord ? { ...savedWord, ...freshWord } : savedWord; });
+      const selectedHistoryLevel = document.getElementById('history-level-select').value;
+      if (selectedHistoryLevel !== 'All') targetArray = targetArray.filter(w => w.level === selectedHistoryLevel);
+      const searchQuery = document.getElementById('history-search').value.toLowerCase().trim();
+      if (searchQuery !== '') {
+        targetArray = targetArray.filter(w => {
+          const enStr = w.en ? String(w.en).toLowerCase() : '';
+          const trStr = w.tr ? String(w.tr).toLowerCase() : '';
+          return enStr.includes(searchQuery) || trStr.includes(searchQuery);
+        });
+      }
+      if (targetArray.length < 3) { showCustomAlert("Yetersiz Kelime", "Bu listede test yapabilmek için en az 3 kelime bulunmalıdır.", 'info'); return; }
+      isCustomQuiz = true; customQuizIdx = 0; generatedQuizzes = [];
+      targetArray.forEach(word => {
+        let wrongOptions = poolSource.filter(w => w.id !== word.id).sort(() => 0.5 - Math.random()).slice(0, 3).map(w => w.tr);
+        let options = [word.tr, ...wrongOptions].sort(() => 0.5 - Math.random()); let correctIdx = options.indexOf(word.tr);
+        generatedQuizzes.push({ level: word.level, q: `'${word.en}' kelimesinin anlamı nedir?`, q_tr: "", ans_tr: "", opts: options, ans: correctIdx, exp: `'${word.en}' kelimesi '${word.tr}' demektir. <br><br><b>Örnek:</b> ${word.ex || '-'}<br><b>Çeviri:</b> ${word.ex_tr || '-'}` });
+      });
+      generatedQuizzes.sort(() => 0.5 - Math.random()); 
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('quiz-view').classList.add('active'); document.querySelector('nav button:nth-child(4)').classList.add('active');
+      document.getElementById('quiz-mode-title').textContent = activeHistoryTab === 'learned' ? "Öğrendiklerim Testi" : "Öğrenmediklerim Testi"; renderQuiz();
+    }
+
+    function renderQuiz() {
+      const sourceArray = isCustomQuiz ? generatedQuizzes : generalQuizzes; const qIdx = isCustomQuiz ? customQuizIdx : currentQuizIdx;
+      if(qIdx >= sourceArray.length) { document.getElementById('quiz-q').textContent = "Test Bitti! Tebrikler 🎉"; document.getElementById('quiz-opts').innerHTML = ''; document.getElementById('quiz-next').style.display = 'none'; document.getElementById('quiz-level').style.display = 'none'; document.getElementById('quiz-explanation').style.display = 'none'; return; }
+      const q = sourceArray[qIdx]; document.getElementById('quiz-q').textContent = q.q;
+      const qLevelBadge = document.getElementById('quiz-level'); qLevelBadge.style.display = 'inline-block'; qLevelBadge.textContent = q.level;
+      const colors = { A1: '#10b981', A2: '#3b82f6', B1: '#8b5cf6', B2: '#f59e0b', C1: '#ef4444', 'Kişisel': '#ec4899' }; qLevelBadge.style.backgroundColor = colors[q.level] || '#64748b';
+      const optsContainer = document.getElementById('quiz-opts'); optsContainer.innerHTML = ''; document.getElementById('quiz-next').style.display = 'none'; document.getElementById('quiz-explanation').style.display = 'none';
+      q.opts.forEach((opt, idx) => { const btn = document.createElement('button'); btn.className = 'option-btn'; btn.textContent = opt; btn.onclick = () => selectOption(btn, idx, q.ans, q.exp, q.q_tr, q.ans_tr); optsContainer.appendChild(btn); });
+    }
+
+    function selectOption(btn, selected, correct, exp, q_tr, ans_tr) {
+      const allBtns = document.querySelectorAll('.option-btn'); allBtns.forEach(b => b.disabled = true);
+      if (selected === correct) { btn.classList.add('correct'); } else { btn.classList.add('wrong'); allBtns[correct].classList.add('correct'); }
+      const expBox = document.getElementById('quiz-explanation'); const trBox = document.getElementById('quiz-q-tr'); const expText = document.getElementById('quiz-exp');
+      if (q_tr) { trBox.style.display = 'block'; let formattedTranslation = q_tr; if (ans_tr) formattedTranslation = formattedTranslation.replace(/_{2,}/, `<span style="color: var(--danger); font-weight: 700;">${ans_tr}</span>`); trBox.innerHTML = "Çeviri: " + formattedTranslation; } else { trBox.style.display = 'none'; }
+      expText.innerHTML = "<b>Açıklama:</b> " + exp; expBox.style.display = 'block'; document.getElementById('quiz-next').style.display = 'block';
+    }
+
+    function loadNextQuiz() { if (isCustomQuiz) customQuizIdx++; else currentQuizIdx = (currentQuizIdx + 1) % generalQuizzes.length; renderQuiz(); }
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => { console.log('Premium Offline Motoru Aktif!'); })
+          .catch(err => { console.error('Offline Motoru başlatılamadı: ', err); });
+      });
+    }
+  </script>
+</body>
+</html>
