@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lingomaster-v2026-3'; // Güncelleme yapacağın zaman sondaki sayıyı artır
+const CACHE_NAME = 'lingomaster-v2026-4'; // Güncelleme yapacağın zaman sondaki sayıyı artır
 
 // 1. KURULUM: Hemen yeni versiyona geçmeyi emret
 self.addEventListener('install', (event) => {
