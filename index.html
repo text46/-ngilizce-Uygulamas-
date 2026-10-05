@@ -1070,7 +1070,7 @@
       if (document.getElementById('streak-text')) document.getElementById('streak-text').textContent = streakData.count + ' Gün';
     }
 
-    const CURRENT_UI_BUILD = '2026.10.08-v1'; 
+    const CURRENT_UI_BUILD = '2026.10.08-v12'; 
     function checkUIBuildVersion() {
       const savedBuild = localStorage.getItem('lingo_ui_build');
       if (savedBuild && savedBuild !== CURRENT_UI_BUILD) { showCustomAlert("Yeni Arayüz Sürümü", "LingoMaster sizin için geliştirildi! En yeni tasarım ve özellikler aktif edildi.", 'ui', false, true); }
