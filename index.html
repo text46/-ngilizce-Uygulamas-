@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#040910" id="meta-theme-color" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="apple-status-bar" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" id="apple-status-bar" />
   <meta name="apple-mobile-web-app-title" content="LingoMaster" />
   <meta name="application-name" content="LingoMaster" />
 
@@ -129,7 +129,7 @@
         var meta = document.getElementById('meta-theme-color');
         if (meta) meta.setAttribute('content', bg);
         var appleMeta = document.getElementById('apple-status-bar');
-        if (appleMeta) appleMeta.setAttribute('content', isDark ? 'black-translucent' : 'default');
+        if (appleMeta) appleMeta.setAttribute('content', 'default');
 
         const savedAccent = localStorage.getItem('lingo_accent_color') || '#3b82f6';
         let c = savedAccent.replace('#', '');
@@ -787,7 +787,7 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      padding-top: calc(env(safe-area-inset-top, 0px) + 8px);
+      padding-top: 10px;
       padding-left: 16px;
       padding-right: 16px;
       padding-bottom: calc(64px + max(10px, env(safe-area-inset-bottom, 0px)));
@@ -6970,7 +6970,7 @@
 
     nav {
       position: fixed !important;
-      bottom: -80px !important;
+      bottom: 0 !important;
       left: 0 !important;
       right: 0 !important;
       margin: 0 auto !important;
@@ -6988,7 +6988,7 @@
       padding-top: 6px !important;
       padding-left: 4px !important;
       padding-right: 4px !important;
-      padding-bottom: calc(80px + max(14px, env(safe-area-inset-bottom, 14px))) !important;
+      padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
       z-index: 100 !important;
       pointer-events: auto !important;
       transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -12658,7 +12658,7 @@
         if(icon && !iconWrap) icon.innerHTML = moonSvg; 
         if(settingsThemeIcon) settingsThemeIcon.innerHTML = moonSvg;
         if(metaTheme) metaTheme.setAttribute('content', '#040910'); 
-        if(appleStatus) appleStatus.setAttribute('content', 'black-translucent'); 
+        if(appleStatus) appleStatus.setAttribute('content', 'default'); 
       } else { 
         if(icon && !iconWrap) icon.innerHTML = sunSvg; 
         if(settingsThemeIcon) settingsThemeIcon.innerHTML = sunSvg;
@@ -14092,7 +14092,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=41')
+        navigator.serviceWorker.register('./sw.js?v=42')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
