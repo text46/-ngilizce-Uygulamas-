@@ -3,6 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <style>
+    /* Immediate synchronous background to prevent any white flash during iOS PWA launch */
+    html, body {
+      background-color: #040910 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    #splash-screen {
+      background-color: #040910 !important;
+    }
+  </style>
   <title>LingoMaster Premium</title>
   <meta name="description" content="Kelime öğrenmenin en akıllı yolu. A1'den C1'e kelime kartları, testler, eşleştirme oyunları ve ayrıntılı istatistikler." />
 
@@ -12,7 +23,7 @@
   <meta name="color-scheme" content="dark light" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" id="apple-status-bar" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="apple-status-bar" />
   <meta name="apple-mobile-web-app-title" content="LingoMaster" />
   <meta name="application-name" content="LingoMaster" />
 
@@ -109,7 +120,7 @@
         var meta = document.getElementById('meta-theme-color');
         if (meta) meta.setAttribute('content', bg);
         var appleMeta = document.getElementById('apple-status-bar');
-        if (appleMeta) appleMeta.setAttribute('content', 'default');
+        if (appleMeta) appleMeta.setAttribute('content', isDark ? 'black-translucent' : 'default');
 
         const savedAccent = localStorage.getItem('lingo_accent_color') || '#3b82f6';
         let c = savedAccent.replace('#', '');
@@ -12633,7 +12644,7 @@
         if(icon && !iconWrap) icon.innerHTML = moonSvg; 
         if(settingsThemeIcon) settingsThemeIcon.innerHTML = moonSvg;
         if(metaTheme) metaTheme.setAttribute('content', '#040910'); 
-        if(appleStatus) appleStatus.setAttribute('content', 'default'); 
+        if(appleStatus) appleStatus.setAttribute('content', 'black-translucent'); 
       } else { 
         if(icon && !iconWrap) icon.innerHTML = sunSvg; 
         if(settingsThemeIcon) settingsThemeIcon.innerHTML = sunSvg;
@@ -14067,7 +14078,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=37')
+        navigator.serviceWorker.register('./sw.js?v=38')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
