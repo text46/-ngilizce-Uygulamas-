@@ -1,12 +1,21 @@
 <!DOCTYPE html>
-<html lang="tr" class="dark-theme">
+<html lang="tr" class="dark-theme" style="background-color: #040910; color-scheme: dark;">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#040910" id="meta-theme-color" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="apple-status-bar" />
+  <meta name="apple-mobile-web-app-title" content="LingoMaster" />
+  <meta name="application-name" content="LingoMaster" />
+
   <style>
     /* Immediate synchronous background to prevent any white flash during iOS PWA launch */
-    html, body {
+    :root, html, body {
       background-color: #040910 !important;
+      color-scheme: dark !important;
       margin: 0 !important;
       padding: 0 !important;
     }
@@ -17,15 +26,15 @@
   <title>LingoMaster Premium</title>
   <meta name="description" content="Kelime öğrenmenin en akıllı yolu. A1'den C1'e kelime kartları, testler, eşleştirme oyunları ve ayrıntılı istatistikler." />
 
+  <!-- Apple iOS Startup Splash Screens (Completely eliminates white flash on PWA launch) -->
+  <link rel="apple-touch-startup-image" href="apple-splash-1320-2868.png?v=7" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+  <link rel="apple-touch-startup-image" href="apple-splash-1179-2556.png?v=7" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+  <link rel="apple-touch-startup-image" href="apple-splash-1290-2796.png?v=7" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+  <link rel="apple-touch-startup-image" href="apple-splash-1170-2532.png?v=7" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+  <link rel="apple-touch-startup-image" href="apple-touch-startup-image.png?v=7" />
+
   <!-- PWA & Mobile Orientation Lock (Strictly Portrait) -->
-  <link rel="manifest" href="manifest.json?v=6" />
-  <meta name="theme-color" content="#040910" id="meta-theme-color" />
-  <meta name="color-scheme" content="dark light" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="apple-status-bar" />
-  <meta name="apple-mobile-web-app-title" content="LingoMaster" />
-  <meta name="application-name" content="LingoMaster" />
+  <link rel="manifest" href="manifest.json?v=7" />
 
   <!-- Apple Touch & Mobile Icons (iOS Screen Time, Home Screen & WebClip) -->
   <link rel="apple-touch-icon" href="apple-touch-icon.png?v=6" />
@@ -7723,18 +7732,23 @@
       --shadow-lg: 0 26px 55px -14px rgba(0, 0, 0, 0.75);
     }
 
-    /* ---------- 1) ZEMİN ---------- */
-    html { background: #f4f8fd !important; }
-    html.dark-theme { background: #040910 !important; }
+    /* ---------- 1) ZEMİN (AKICI VE KESİNTİSİZ PREMİUM DEGRADE) ---------- */
+    html { background-color: #f4f8fd !important; }
+    html.dark-theme { 
+      background-color: #040910 !important;
+      background-image: radial-gradient(900px 480px at 50% 0%, rgba(var(--primary-rgb), 0.18) 0%, transparent 65%) !important;
+      background-attachment: fixed !important;
+    }
     body {
       background-color: var(--bg) !important;
-      background-image: none !important;
     }
     body:not(.dark-theme) {
       background-image: linear-gradient(180deg, #f4f8fd 0%, #e6ecf5 100%) !important;
     }
     body.dark-theme {
-      background-image: radial-gradient(900px 480px at 50% -12%, rgba(var(--primary-rgb), 0.16) 0%, transparent 62%) !important;
+      background-color: transparent !important;
+      background-image: radial-gradient(900px 480px at 50% 0%, rgba(var(--primary-rgb), 0.18) 0%, transparent 65%) !important;
+      background-attachment: fixed !important;
     }
 
     /* ---------- 2) GENEL BEYAZ KART YÜZEYİ ---------- */
@@ -8471,7 +8485,7 @@
     }
   </style>
 </head>
-<body class="dark-theme">
+<body class="dark-theme" style="background-color: #040910; color-scheme: dark;">
 
   <!-- DİKEY MOD KİLİT EKRANI (PORTRAIT ORIENTATION ENFORCER) -->
   <div id="portrait-lock-overlay">
@@ -14078,7 +14092,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=38')
+        navigator.serviceWorker.register('./sw.js?v=39')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');

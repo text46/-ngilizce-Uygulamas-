@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lingomaster-v2026-38';
+const CACHE_NAME = 'lingomaster-v2026-39';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting(); 
@@ -9,6 +9,11 @@ self.addEventListener('install', (event) => {
       './words.js',
       './apple-touch-icon.png',
       './icon.png',
+      './apple-touch-startup-image.png',
+      './apple-splash-1320-2868.png',
+      './apple-splash-1179-2556.png',
+      './apple-splash-1290-2796.png',
+      './apple-splash-1170-2532.png',
       './manifest.json'
     ])).catch(() => {})
   );
