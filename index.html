@@ -784,7 +784,7 @@
 
     /* MAIN CONTAINER & VIEW TRANSITIONS */
     main {
-      flex: 1 !important;
+      flex: 1 1 0% !important;
       display: flex !important;
       flex-direction: column !important;
       overflow: hidden !important;
@@ -799,13 +799,13 @@
     .view {
       display: none !important;
       flex-direction: column !important;
-      flex: 1 !important;
+      flex: 1 1 0% !important;
       min-height: 0 !important;
       overflow-y: auto !important;
       overflow-x: hidden !important;
       -webkit-overflow-scrolling: touch !important;
       overscroll-behavior-y: contain !important;
-      padding-bottom: calc(76px + max(14px, env(safe-area-inset-bottom, 14px))) !important;
+      padding-bottom: 24px !important;
     }
     /* EKRANLAR ARASI GEZİNİRKEN SCROLLBAR GİZLE (NATIVE PREMIUM MOBİL HİSSİYATI) */
     .view,
@@ -6971,10 +6971,11 @@
     /* ============================================================== */
 
     nav {
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
+      flex-shrink: 0 !important;
+      position: relative !important;
+      left: auto !important;
+      right: auto !important;
+      bottom: auto !important;
       margin: 0 auto !important;
       transform: none !important;
       width: 100% !important;
@@ -14094,12 +14095,29 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=43')
+        navigator.serviceWorker.register('./sw.js?v=44')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
+
+            // Periyodik ve odaklanıldığında anında arka plan güncelleme kontrolü
+            setInterval(() => { registration.update(); }, 30000);
+            document.addEventListener('visibilitychange', () => {
+              if (document.visibilityState === 'visible') {
+                registration.update();
+              }
+            });
           })
           .catch(err => { console.error('Offline Motoru başlatılamadı: ', err); });
+
+        // Yeni sürüm indiğinde uygulamayı anında pürüzsüzce güncelle
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
       });
     }
   </script>
