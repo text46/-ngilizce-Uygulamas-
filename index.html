@@ -12,7 +12,7 @@
   <meta name="color-scheme" content="dark light" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="apple-status-bar" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" id="apple-status-bar" />
   <meta name="apple-mobile-web-app-title" content="LingoMaster" />
   <meta name="application-name" content="LingoMaster" />
 
@@ -109,7 +109,7 @@
         var meta = document.getElementById('meta-theme-color');
         if (meta) meta.setAttribute('content', bg);
         var appleMeta = document.getElementById('apple-status-bar');
-        if (appleMeta) appleMeta.setAttribute('content', isDark ? 'black-translucent' : 'default');
+        if (appleMeta) appleMeta.setAttribute('content', 'default');
 
         const savedAccent = localStorage.getItem('lingo_accent_color') || '#3b82f6';
         let c = savedAccent.replace('#', '');
@@ -335,8 +335,8 @@
     html {
       width: 100%;
       height: 100%;
-      height: 100dvh;
-      min-height: 100dvh;
+      min-height: 100%;
+      min-height: -webkit-fill-available;
       margin: 0;
       padding: 0;
       background-color: var(--bg);
@@ -351,7 +351,8 @@
       color: var(--text);
       width: 100%;
       height: 100%;
-      height: 100dvh;
+      min-height: 100%;
+      min-height: -webkit-fill-available;
       min-height: 100dvh;
       max-width: 500px;
       margin: 0 auto;
@@ -6957,6 +6958,8 @@
       width: 100% !important;
       max-width: 500px !important;
       border-radius: 20px 20px 0 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
       backdrop-filter: blur(28px) saturate(190%) !important;
       -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
       display: flex !important;
@@ -6965,7 +6968,7 @@
       padding-top: 6px !important;
       padding-left: 4px !important;
       padding-right: 4px !important;
-      padding-bottom: max(12px, env(safe-area-inset-bottom, 12px)) !important;
+      padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
       z-index: 100 !important;
       pointer-events: auto !important;
       transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -6978,24 +6981,30 @@
       left: 0 !important;
       right: 0 !important;
       width: 100% !important;
-      height: 140px !important;
+      height: 200px !important;
       pointer-events: none !important;
       z-index: 99 !important;
     }
     body.dark-theme nav {
-      background: rgba(11, 19, 32, 0.96) !important;
+      background: rgba(11, 19, 32, 0.98) !important;
       border: none !important;
       border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-      box-shadow: 0 -8px 26px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+      border-bottom: none !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5), 0 30px 0 0 rgba(11, 19, 32, 0.98), 0 60px 0 0 rgba(11, 19, 32, 0.98), 0 90px 0 0 rgba(11, 19, 32, 0.98), 0 120px 0 0 rgba(11, 19, 32, 0.98) !important;
     }
     body.dark-theme nav::after {
       background: rgba(11, 19, 32, 0.98) !important;
     }
     body:not(.dark-theme) nav {
-      background: rgba(255, 255, 255, 0.96) !important;
+      background: rgba(255, 255, 255, 0.98) !important;
       border: none !important;
       border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
-      box-shadow: 0 -6px 20px rgba(15, 23, 42, 0.06), inset 0 1px 0 #ffffff !important;
+      border-bottom: none !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06), 0 30px 0 0 rgba(255, 255, 255, 0.98), 0 60px 0 0 rgba(255, 255, 255, 0.98), 0 90px 0 0 rgba(255, 255, 255, 0.98), 0 120px 0 0 rgba(255, 255, 255, 0.98) !important;
     }
     body:not(.dark-theme) nav::after {
       background: rgba(255, 255, 255, 0.98) !important;
@@ -8403,12 +8412,7 @@
     body.dark-theme .settings-group {
       background-image: linear-gradient(180deg, #0d1829 0%, #0a1320 100%) !important;
     }
-    nav {
-      box-shadow: 0 16px 40px -22px rgba(15, 30, 56, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.90) !important;
-    }
-    body.dark-theme nav {
-      box-shadow: 0 20px 44px -18px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
-    }
+    /* nav shadows are cleanly defined in main nav block */
     .modal-box {
       box-shadow: 0 30px 70px -30px rgba(10, 24, 46, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.90) !important;
     }
@@ -12629,7 +12633,7 @@
         if(icon && !iconWrap) icon.innerHTML = moonSvg; 
         if(settingsThemeIcon) settingsThemeIcon.innerHTML = moonSvg;
         if(metaTheme) metaTheme.setAttribute('content', '#040910'); 
-        if(appleStatus) appleStatus.setAttribute('content', 'black-translucent'); 
+        if(appleStatus) appleStatus.setAttribute('content', 'default'); 
       } else { 
         if(icon && !iconWrap) icon.innerHTML = sunSvg; 
         if(settingsThemeIcon) settingsThemeIcon.innerHTML = sunSvg;
@@ -14063,8 +14067,11 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-          .then(registration => { console.log('Premium Offline Motoru Aktif!'); })
+        navigator.serviceWorker.register('./sw.js?v=37')
+          .then(registration => {
+            registration.update();
+            console.log('Premium Offline Motoru Aktif!');
+          })
           .catch(err => { console.error('Offline Motoru başlatılamadı: ', err); });
       });
     }
