@@ -94,7 +94,7 @@
   <!-- Pre-hydration theme synchronizer: eliminates top black/white flash on launch -->
   <script>
     window.appLaunchTimestamp = Date.now();
-    window.MIN_SPLASH_SCREEN_DURATION = 1200;
+    window.MIN_SPLASH_SCREEN_DURATION = 600;
     window.splashDismissScheduled = false;
 
     window.dismissSplash = function(immediate) {
@@ -13239,6 +13239,7 @@
       if (targetView) targetView.classList.add('active');
       const targetNav = element || document.getElementById(`nav-${viewId}`);
       if (targetNav) targetNav.classList.add('active');
+      if (typeof anchorNavToViewport === 'function') anchorNavToViewport();
       if (viewId === 'home') {
         renderHomeView();
       }
@@ -14079,11 +14080,42 @@
     document.addEventListener('click', () => { setTimeout(syncModalOpenState, 30); }, { passive: true });
     window.addEventListener('popstate', syncModalOpenState);
 
+    // Automatic iOS Standalone Bottom Dock Anchor:
+    // Pushes nav bar down to the exact physical screen edge if WebKit shifts layout viewport
+    function anchorNavToViewport() {
+      const nav = document.querySelector('nav');
+      if (!nav) return;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const isStandalone = window.navigator.standalone || 
+                           window.matchMedia('(display-mode: standalone)').matches;
+
+      if (isIOS && isStandalone) {
+        const gap = window.screen.height - window.innerHeight;
+        if (gap > 20 && gap < 140) {
+          nav.style.setProperty('bottom', `-${gap}px`, 'important');
+          nav.style.setProperty('padding-bottom', `calc(${gap}px + 12px)`, 'important');
+          return;
+        }
+      }
+      nav.style.setProperty('bottom', '0px', 'important');
+    }
+    window.anchorNavToViewport = anchorNavToViewport;
+    window.addEventListener('resize', anchorNavToViewport);
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', anchorNavToViewport);
+    }
+    document.addEventListener('DOMContentLoaded', anchorNavToViewport);
+    window.addEventListener('load', anchorNavToViewport);
+    setTimeout(anchorNavToViewport, 100);
+    setTimeout(anchorNavToViewport, 500);
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initApp);
-      window.addEventListener('load', initApp);
+      document.addEventListener('DOMContentLoaded', () => { initApp(); anchorNavToViewport(); });
+      window.addEventListener('load', () => { initApp(); anchorNavToViewport(); });
     } else {
       initApp();
+      anchorNavToViewport();
     }
     setTimeout(initApp, 400);
     setTimeout(dismissSplash, MIN_SPLASH_SCREEN_DURATION + 100);
@@ -14092,7 +14124,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=39')
+        navigator.serviceWorker.register('./sw.js?v=40')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
