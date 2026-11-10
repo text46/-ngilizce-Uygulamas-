@@ -361,7 +361,7 @@
       padding: 0;
       background-color: var(--bg);
       color: var(--text);
-      overflow: hidden;
+      overflow-x: hidden;
       transition: background-color 0.4s ease;
       -webkit-text-size-adjust: 100%;
     }
@@ -377,7 +377,7 @@
       max-width: 500px;
       margin: 0 auto;
       padding: 0;
-      overflow: hidden;
+      overflow-x: hidden;
       position: relative;
       display: flex;
       flex-direction: column;
@@ -6970,7 +6970,7 @@
 
     nav {
       position: fixed !important;
-      bottom: 0 !important;
+      bottom: -80px !important;
       left: 0 !important;
       right: 0 !important;
       margin: 0 auto !important;
@@ -6988,7 +6988,7 @@
       padding-top: 6px !important;
       padding-left: 4px !important;
       padding-right: 4px !important;
-      padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
+      padding-bottom: calc(80px + max(14px, env(safe-area-inset-bottom, 14px))) !important;
       z-index: 100 !important;
       pointer-events: auto !important;
       transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -13239,7 +13239,6 @@
       if (targetView) targetView.classList.add('active');
       const targetNav = element || document.getElementById(`nav-${viewId}`);
       if (targetNav) targetNav.classList.add('active');
-      if (typeof anchorNavToViewport === 'function') anchorNavToViewport();
       if (viewId === 'home') {
         renderHomeView();
       }
@@ -14080,42 +14079,11 @@
     document.addEventListener('click', () => { setTimeout(syncModalOpenState, 30); }, { passive: true });
     window.addEventListener('popstate', syncModalOpenState);
 
-    // Automatic iOS Standalone Bottom Dock Anchor:
-    // Pushes nav bar down to the exact physical screen edge if WebKit shifts layout viewport
-    function anchorNavToViewport() {
-      const nav = document.querySelector('nav');
-      if (!nav) return;
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-      const isStandalone = window.navigator.standalone || 
-                           window.matchMedia('(display-mode: standalone)').matches;
-
-      if (isIOS && isStandalone) {
-        const gap = window.screen.height - window.innerHeight;
-        if (gap > 20 && gap < 140) {
-          nav.style.setProperty('bottom', `-${gap}px`, 'important');
-          nav.style.setProperty('padding-bottom', `calc(${gap}px + 12px)`, 'important');
-          return;
-        }
-      }
-      nav.style.setProperty('bottom', '0px', 'important');
-    }
-    window.anchorNavToViewport = anchorNavToViewport;
-    window.addEventListener('resize', anchorNavToViewport);
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', anchorNavToViewport);
-    }
-    document.addEventListener('DOMContentLoaded', anchorNavToViewport);
-    window.addEventListener('load', anchorNavToViewport);
-    setTimeout(anchorNavToViewport, 100);
-    setTimeout(anchorNavToViewport, 500);
-
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => { initApp(); anchorNavToViewport(); });
-      window.addEventListener('load', () => { initApp(); anchorNavToViewport(); });
+      document.addEventListener('DOMContentLoaded', initApp);
+      window.addEventListener('load', initApp);
     } else {
       initApp();
-      anchorNavToViewport();
     }
     setTimeout(initApp, 400);
     setTimeout(dismissSplash, MIN_SPLASH_SCREEN_DURATION + 100);
@@ -14124,7 +14092,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=40')
+        navigator.serviceWorker.register('./sw.js?v=41')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
