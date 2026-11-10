@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#040910" id="meta-theme-color" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" id="apple-status-bar" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="apple-status-bar" />
   <meta name="apple-mobile-web-app-title" content="LingoMaster" />
   <meta name="application-name" content="LingoMaster" />
 
@@ -129,7 +129,7 @@
         var meta = document.getElementById('meta-theme-color');
         if (meta) meta.setAttribute('content', bg);
         var appleMeta = document.getElementById('apple-status-bar');
-        if (appleMeta) appleMeta.setAttribute('content', 'default');
+        if (appleMeta) appleMeta.setAttribute('content', isDark ? 'black-translucent' : 'default');
 
         const savedAccent = localStorage.getItem('lingo_accent_color') || '#3b82f6';
         let c = savedAccent.replace('#', '');
@@ -352,16 +352,28 @@
       }
     }
 
+    html, body {
+      position: fixed !important;
+      inset: 0 !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100% !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
+      overflow: hidden !important;
+      touch-action: pan-y !important;
+      overscroll-behavior: none !important;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
     html {
-      width: 100%;
-      height: 100%;
-      min-height: 100%;
-      min-height: -webkit-fill-available;
-      margin: 0;
-      padding: 0;
       background-color: var(--bg);
       color: var(--text);
-      overflow-x: hidden;
       transition: background-color 0.4s ease;
       -webkit-text-size-adjust: 100%;
     }
@@ -369,21 +381,10 @@
     body {
       background-color: var(--bg);
       color: var(--text);
-      width: 100%;
-      height: 100%;
-      min-height: 100%;
-      min-height: -webkit-fill-available;
-      min-height: 100dvh;
-      max-width: 500px;
-      margin: 0 auto;
-      padding: 0;
-      overflow-x: hidden;
-      position: relative;
-      display: flex;
-      flex-direction: column;
+      max-width: 500px !important;
+      display: flex !important;
+      flex-direction: column !important;
       transition: background-color 0.4s ease, color 0.4s ease;
-      touch-action: pan-y;
-      overscroll-behavior-y: none;
     }
 
     /* ÖZEL RENK STÜDYOSU (DAHİLİ KOYU TEMA) */
@@ -783,27 +784,28 @@
 
     /* MAIN CONTAINER & VIEW TRANSITIONS */
     main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      padding-top: 10px;
-      padding-left: 16px;
-      padding-right: 16px;
-      padding-bottom: calc(64px + max(10px, env(safe-area-inset-bottom, 0px)));
-      position: relative;
-      min-height: 0;
+      flex: 1 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 8px) !important;
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+      padding-bottom: 0 !important;
+      position: relative !important;
+      min-height: 0 !important;
     }
 
     .view {
       display: none !important;
-      flex-direction: column;
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding-bottom: 24px;
-      -webkit-overflow-scrolling: touch;
+      flex-direction: column !important;
+      flex: 1 !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior-y: contain !important;
+      padding-bottom: calc(76px + max(14px, env(safe-area-inset-bottom, 14px))) !important;
     }
     /* EKRANLAR ARASI GEZİNİRKEN SCROLLBAR GİZLE (NATIVE PREMIUM MOBİL HİSSİYATI) */
     .view,
@@ -12658,7 +12660,7 @@
         if(icon && !iconWrap) icon.innerHTML = moonSvg; 
         if(settingsThemeIcon) settingsThemeIcon.innerHTML = moonSvg;
         if(metaTheme) metaTheme.setAttribute('content', '#040910'); 
-        if(appleStatus) appleStatus.setAttribute('content', 'default'); 
+        if(appleStatus) appleStatus.setAttribute('content', 'black-translucent'); 
       } else { 
         if(icon && !iconWrap) icon.innerHTML = sunSvg; 
         if(settingsThemeIcon) settingsThemeIcon.innerHTML = sunSvg;
@@ -14092,7 +14094,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=42')
+        navigator.serviceWorker.register('./sw.js?v=43')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
