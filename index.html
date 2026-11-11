@@ -382,8 +382,7 @@
       -webkit-user-select: none;
       user-select: none;
       overflow-x: hidden !important;
-      touch-action: pan-y !important;
-      overscroll-behavior-y: none !important;
+      -webkit-overflow-scrolling: touch !important;
     }
 
     /* ÖZEL RENK STÜDYOSU (DAHİLİ KOYU TEMA) */
@@ -14134,24 +14133,6 @@
       }
     }, { passive: true });
 
-    document.addEventListener('touchmove', function(e) {
-      let el = e.target;
-      let canScroll = false;
-      while (el && el !== document.body && el !== document.documentElement) {
-        if (el.scrollHeight > el.clientHeight) {
-          const style = window.getComputedStyle(el);
-          if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
-            canScroll = true;
-            break;
-          }
-        }
-        el = el.parentElement;
-      }
-      if (!canScroll) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
       window.addEventListener('load', initApp);
@@ -14165,7 +14146,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=47')
+        navigator.serviceWorker.register('./sw.js?v=48')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
