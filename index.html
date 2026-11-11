@@ -363,12 +363,14 @@
       -webkit-text-size-adjust: 100%;
       -webkit-user-select: none;
       user-select: none;
-      overflow: hidden !important;
+      overflow-x: hidden !important;
     }
 
     body {
       width: 100% !important;
-      height: 100% !important;
+      min-height: 100% !important;
+      min-height: 100vh !important;
+      min-height: 100dvh !important;
       margin: 0 auto !important;
       padding: 0 !important;
       background-color: var(--bg) !important;
@@ -379,7 +381,8 @@
       transition: background-color 0.4s ease, color 0.4s ease;
       -webkit-user-select: none;
       user-select: none;
-      overflow: hidden !important;
+      overflow-x: hidden !important;
+      -webkit-overflow-scrolling: touch !important;
     }
 
     /* ÖZEL RENK STÜDYOSU (DAHİLİ KOYU TEMA) */
@@ -777,34 +780,21 @@
       100% { transform: translateX(250%); }
     }
 
-    /* TOP STATUS BAR SHIELD (IOS DYNAMIC ISLAND / STATUS BAR OVERFLOW SHIELD) */
-    .ios-status-bar-shield {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      width: 100% !important;
-      height: calc(env(safe-area-inset-top, 0px) + 2px) !important;
-      background: var(--bg) !important;
-      backdrop-filter: blur(24px) saturate(190%) !important;
-      -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
-      z-index: 9999 !important;
-      pointer-events: none !important;
-    }
-
     /* MAIN CONTAINER & VIEW TRANSITIONS */
     main {
       flex: 1 1 0% !important;
       display: flex !important;
       flex-direction: column !important;
       overflow: hidden !important;
-      margin-top: env(safe-area-inset-top, 0px) !important;
-      padding-top: 8px !important;
+      margin-top: 0 !important;
+      padding-top: calc(max(env(safe-area-inset-top, 0px), 20px) + 8px) !important;
       padding-left: 16px !important;
       padding-right: 16px !important;
       padding-bottom: calc(65px + max(14px, env(safe-area-inset-bottom, 20px))) !important;
       position: relative !important;
       min-height: 0 !important;
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent max(env(safe-area-inset-top, 0px), 20px), black calc(max(env(safe-area-inset-top, 0px), 20px) + 14px), black 100%) !important;
+      mask-image: linear-gradient(to bottom, transparent 0, transparent max(env(safe-area-inset-top, 0px), 20px), black calc(max(env(safe-area-inset-top, 0px), 20px) + 14px), black 100%) !important;
     }
 
     .view {
@@ -8498,9 +8488,6 @@
 </head>
 <body class="dark-theme" style="background-color: #040910; color-scheme: dark;">
 
-  <!-- TOP STATUS BAR SHIELD (IOS DYNAMIC ISLAND / CLOCK / BATTERY OVERFLOW SHIELD) -->
-  <div class="ios-status-bar-shield" aria-hidden="true"></div>
-
   <!-- DİKEY MOD KİLİT EKRANI (PORTRAIT ORIENTATION ENFORCER) -->
   <div id="portrait-lock-overlay">
     <div class="portrait-lock-card">
@@ -14150,7 +14137,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=51')
+        navigator.serviceWorker.register('./sw.js?v=52')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
