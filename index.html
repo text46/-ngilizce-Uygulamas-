@@ -360,7 +360,7 @@
       right: 0 !important;
       bottom: 0 !important;
       width: 100vw !important;
-      height: 100vh !important;
+      width: 100% !important;
       height: 100% !important;
       margin: 0 auto !important;
       padding: 0 !important;
@@ -791,7 +791,7 @@
       padding-top: calc(env(safe-area-inset-top, 0px) + 8px) !important;
       padding-left: 16px !important;
       padding-right: 16px !important;
-      padding-bottom: 0 !important;
+      padding-bottom: calc(65px + max(14px, env(safe-area-inset-bottom, 20px))) !important;
       position: relative !important;
       min-height: 0 !important;
     }
@@ -6971,11 +6971,10 @@
     /* ============================================================== */
 
     nav {
-      flex-shrink: 0 !important;
-      position: relative !important;
-      left: auto !important;
-      right: auto !important;
-      bottom: auto !important;
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
       margin: 0 auto !important;
       transform: none !important;
       width: 100% !important;
@@ -6991,8 +6990,8 @@
       padding-top: 6px !important;
       padding-left: 4px !important;
       padding-right: 4px !important;
-      padding-bottom: max(14px, env(safe-area-inset-bottom, 14px)) !important;
-      z-index: 100 !important;
+      padding-bottom: max(14px, env(safe-area-inset-bottom, 20px)) !important;
+      z-index: 1000 !important;
       pointer-events: auto !important;
       transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
       box-sizing: border-box !important;
@@ -13994,6 +13993,22 @@
       dismissSplash();
       setTimeout(checkAndShowWelcomeUsernameModal, MIN_SPLASH_SCREEN_DURATION + 200);
 
+      // Otomatik güncelleme sonrası bildirim uyarısı
+      try {
+        if (sessionStorage.getItem('lingo_update_just_applied') === 'true') {
+          sessionStorage.removeItem('lingo_update_just_applied');
+          setTimeout(() => {
+            if (typeof showCustomAlert === 'function') {
+              showCustomAlert(
+                "Güncelleme Yapıldı",
+                "LingoMaster en son sürüme başarıyla güncellendi! Tüm yenilikler ve ekran optimizasyonları aktif.",
+                "success"
+              );
+            }
+          }, 900);
+        }
+      } catch (e) {}
+
       try {
         // 1. Kart ayarlarını localStorage'dan güvenle çek ve arayüz elemanlarına yansıt
         cardSettings = getStoredCardSettings();
@@ -14082,6 +14097,92 @@
     document.addEventListener('click', () => { setTimeout(syncModalOpenState, 30); }, { passive: true });
     window.addEventListener('popstate', syncModalOpenState);
 
+    /* ============================================================== */
+    /* UNIVERSAL IPHONE & MOBILE VIEWPORT HEIGHT ENFORCER (IPHONE 11-18) */
+    /* ============================================================== */
+    function enforceUniversalIphoneViewport() {
+      try {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const isStandalone = window.navigator.standalone || 
+                             window.matchMedia('(display-mode: standalone)').matches;
+
+        const screenH = Math.max(window.screen.height, window.screen.width);
+        const winH = window.innerHeight;
+
+        // In iOS PWA Standalone with black-translucent, WebKit often truncates
+        // innerHeight by the status bar (e.g. 897px instead of 956px on 16 Pro Max).
+        // Enforce true physical screen height so nav bar reaches the bottom edge.
+        // Only in iOS standalone PWA when WebKit reports truncated innerHeight
+        if (isIOS && isStandalone && screenH > winH && screenH > 500) {
+          document.documentElement.style.setProperty('--app-height', screenH + 'px');
+          document.documentElement.style.setProperty('height', screenH + 'px', 'important');
+          if (document.body) {
+            document.body.style.setProperty('height', screenH + 'px', 'important');
+          }
+        } else {
+          document.documentElement.style.removeProperty('--app-height');
+          document.documentElement.style.removeProperty('height');
+          if (document.body) {
+            document.body.style.removeProperty('height');
+            document.body.style.removeProperty('min-height');
+            document.body.style.removeProperty('max-height');
+          }
+        }
+
+        // Lock window scroll so header never collides with Dynamic Island / Status Bar
+        if (window.scrollY !== 0 || window.scrollX !== 0) {
+          window.scrollTo(0, 0);
+        }
+      } catch (e) {}
+    }
+
+    // Run enforcer across all lifecycle stages
+    enforceUniversalIphoneViewport();
+    window.addEventListener('resize', enforceUniversalIphoneViewport);
+    window.addEventListener('orientationchange', enforceUniversalIphoneViewport);
+    document.addEventListener('DOMContentLoaded', enforceUniversalIphoneViewport);
+    window.addEventListener('load', enforceUniversalIphoneViewport);
+    window.addEventListener('pageshow', enforceUniversalIphoneViewport);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        enforceUniversalIphoneViewport();
+      }
+    });
+
+    // Keyboard dismiss recovery for WebKit
+    window.addEventListener('focusout', () => {
+      setTimeout(() => {
+        enforceUniversalIphoneViewport();
+        window.scrollTo(0, 0);
+      }, 120);
+    });
+
+    // Strict window-level overscroll prevention (prevents dragging fixed body into status bar)
+    window.addEventListener('scroll', () => {
+      if (window.scrollY !== 0 || window.scrollX !== 0) {
+        window.scrollTo(0, 0);
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e) {
+      let el = e.target;
+      let canScroll = false;
+      while (el && el !== document.body && el !== document.documentElement) {
+        if (el.scrollHeight > el.clientHeight) {
+          const style = window.getComputedStyle(el);
+          if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+            canScroll = true;
+            break;
+          }
+        }
+        el = el.parentElement;
+      }
+      if (!canScroll) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
       window.addEventListener('load', initApp);
@@ -14095,13 +14196,13 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=44')
+        navigator.serviceWorker.register('./sw.js?v=45')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
 
             // Periyodik ve odaklanıldığında anında arka plan güncelleme kontrolü
-            setInterval(() => { registration.update(); }, 30000);
+            setInterval(() => { registration.update(); }, 25000);
             document.addEventListener('visibilitychange', () => {
               if (document.visibilityState === 'visible') {
                 registration.update();
@@ -14110,11 +14211,14 @@
           })
           .catch(err => { console.error('Offline Motoru başlatılamadı: ', err); });
 
-        // Yeni sürüm indiğinde uygulamayı anında pürüzsüzce güncelle
+        // Yeni sürüm indiğinde uygulamayı anında pürüzsüzce güncelle ve bildirimi kaydet
         let refreshing = false;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
           if (!refreshing) {
             refreshing = true;
+            try {
+              sessionStorage.setItem('lingo_update_just_applied', 'true');
+            } catch (e) {}
             window.location.reload();
           }
         });
