@@ -14097,12 +14097,7 @@
     /* UNIVERSAL IPHONE & MOBILE VIEWPORT HEIGHT ENFORCER (IPHONE 11-18) */
     /* ============================================================== */
     function enforceUniversalIphoneViewport() {
-      try {
-        // Lock window scroll so header never collides with Dynamic Island / Status Bar
-        if (window.scrollY !== 0 || window.scrollX !== 0) {
-          window.scrollTo(0, 0);
-        }
-      } catch (e) {}
+      // Clean viewport lifecycle handler
     }
 
     // Run enforcer across all lifecycle stages
@@ -14126,13 +14121,6 @@
       }, 120);
     });
 
-    // Strict window-level overscroll prevention (prevents dragging fixed body into status bar)
-    window.addEventListener('scroll', () => {
-      if (window.scrollY !== 0 || window.scrollX !== 0) {
-        window.scrollTo(0, 0);
-      }
-    }, { passive: true });
-
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initApp);
       window.addEventListener('load', initApp);
@@ -14146,7 +14134,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=48')
+        navigator.serviceWorker.register('./sw.js?v=49')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
