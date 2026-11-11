@@ -352,38 +352,38 @@
       }
     }
 
-    html, body {
-      position: fixed !important;
-      inset: 0 !important;
-      top: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      bottom: 0 !important;
-      width: 100vw !important;
+    html {
       width: 100% !important;
       height: 100% !important;
       margin: 0 auto !important;
       padding: 0 !important;
-      touch-action: pan-y !important;
-      overscroll-behavior: none !important;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-
-    html {
-      background-color: var(--bg);
-      color: var(--text);
+      background-color: var(--bg) !important;
+      color: var(--text) !important;
       transition: background-color 0.4s ease;
       -webkit-text-size-adjust: 100%;
+      -webkit-user-select: none;
+      user-select: none;
+      overflow-x: hidden !important;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
+      width: 100% !important;
+      min-height: 100% !important;
+      min-height: 100vh !important;
+      min-height: 100dvh !important;
+      margin: 0 auto !important;
+      padding: 0 !important;
+      background-color: var(--bg) !important;
+      color: var(--text) !important;
       max-width: 500px !important;
       display: flex !important;
       flex-direction: column !important;
       transition: background-color 0.4s ease, color 0.4s ease;
+      -webkit-user-select: none;
+      user-select: none;
+      overflow-x: hidden !important;
+      touch-action: pan-y !important;
+      overscroll-behavior-y: none !important;
     }
 
     /* ÖZEL RENK STÜDYOSU (DAHİLİ KOYU TEMA) */
@@ -14099,37 +14099,6 @@
     /* ============================================================== */
     function enforceUniversalIphoneViewport() {
       try {
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        const isStandalone = window.navigator.standalone || 
-                             window.matchMedia('(display-mode: standalone)').matches;
-
-        const screenH = Math.max(window.screen.height, window.screen.width);
-        const winH = window.innerHeight;
-
-        // In iOS PWA Standalone with black-translucent, WebKit often truncates
-        // innerHeight by the status bar (e.g. 897px instead of 956px on 16 Pro Max).
-        // Enforce true physical screen height so nav bar reaches the bottom edge.
-        // If on iPhone in standalone mode, guarantee nav bar background extends completely to bottom edge
-        const nav = document.querySelector('nav');
-        if (nav) {
-          if (isIOS && isStandalone && screenH > winH && (screenH - winH) > 20) {
-            // WebKit status bar layout offset deficit (e.g. 59px on iPhone 16 Pro Max)
-            const gap = screenH - winH;
-            nav.style.setProperty('bottom', `-${gap}px`, 'important');
-            nav.style.setProperty('padding-bottom', `calc(${gap}px + max(16px, env(safe-area-inset-bottom, 24px)))`, 'important');
-          } else {
-            nav.style.removeProperty('bottom');
-            nav.style.removeProperty('padding-bottom');
-          }
-        }
-
-        if (isIOS && isStandalone && screenH > winH && screenH > 500) {
-          document.documentElement.style.setProperty('--app-height', screenH + 'px');
-        } else {
-          document.documentElement.style.removeProperty('--app-height');
-        }
-
         // Lock window scroll so header never collides with Dynamic Island / Status Bar
         if (window.scrollY !== 0 || window.scrollX !== 0) {
           window.scrollTo(0, 0);
@@ -14196,7 +14165,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=46')
+        navigator.serviceWorker.register('./sw.js?v=47')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
