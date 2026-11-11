@@ -364,7 +364,6 @@
       height: 100% !important;
       margin: 0 auto !important;
       padding: 0 !important;
-      overflow: hidden !important;
       touch-action: pan-y !important;
       overscroll-behavior: none !important;
       -webkit-user-select: none;
@@ -6979,7 +6978,7 @@
       transform: none !important;
       width: 100% !important;
       max-width: 500px !important;
-      border-radius: 20px 20px 0 0 !important;
+      border-radius: 0 !important;
       border-bottom-left-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
       backdrop-filter: blur(28px) saturate(190%) !important;
@@ -6987,10 +6986,10 @@
       display: flex !important;
       justify-content: space-around !important;
       align-items: center !important;
-      padding-top: 6px !important;
+      padding-top: 8px !important;
       padding-left: 4px !important;
       padding-right: 4px !important;
-      padding-bottom: max(14px, env(safe-area-inset-bottom, 20px)) !important;
+      padding-bottom: max(16px, env(safe-area-inset-bottom, 24px)) !important;
       z-index: 1000 !important;
       pointer-events: auto !important;
       transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -7003,7 +7002,7 @@
       left: 0 !important;
       right: 0 !important;
       width: 100% !important;
-      height: 200px !important;
+      height: 300px !important;
       pointer-events: none !important;
       z-index: 99 !important;
     }
@@ -7012,9 +7011,8 @@
       border: none !important;
       border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
       border-bottom: none !important;
-      border-bottom-left-radius: 0 !important;
-      border-bottom-right-radius: 0 !important;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5), 0 30px 0 0 rgba(11, 19, 32, 0.98), 0 60px 0 0 rgba(11, 19, 32, 0.98), 0 90px 0 0 rgba(11, 19, 32, 0.98), 0 120px 0 0 rgba(11, 19, 32, 0.98) !important;
+      border-radius: 0 !important;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5), 0 50px 0 50px rgba(11, 19, 32, 0.98), 0 100px 0 50px rgba(11, 19, 32, 0.98) !important;
     }
     body.dark-theme nav::after {
       background: rgba(11, 19, 32, 0.98) !important;
@@ -7024,9 +7022,8 @@
       border: none !important;
       border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
       border-bottom: none !important;
-      border-bottom-left-radius: 0 !important;
-      border-bottom-right-radius: 0 !important;
-      box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06), 0 30px 0 0 rgba(255, 255, 255, 0.98), 0 60px 0 0 rgba(255, 255, 255, 0.98), 0 90px 0 0 rgba(255, 255, 255, 0.98), 0 120px 0 0 rgba(255, 255, 255, 0.98) !important;
+      border-radius: 0 !important;
+      box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06), 0 50px 0 50px rgba(255, 255, 255, 0.98), 0 100px 0 50px rgba(255, 255, 255, 0.98) !important;
     }
     body:not(.dark-theme) nav::after {
       background: rgba(255, 255, 255, 0.98) !important;
@@ -7904,7 +7901,7 @@
 
     /* ---------- 7) ALT NAVİGASYON (BEYAZ DOCK + LACİVERT PILL) ---------- */
     nav {
-      border-radius: 20px 20px 0 0 !important;
+      border-radius: 0 !important;
       backdrop-filter: blur(28px) saturate(190%) !important;
       -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
     }
@@ -14113,21 +14110,24 @@
         // In iOS PWA Standalone with black-translucent, WebKit often truncates
         // innerHeight by the status bar (e.g. 897px instead of 956px on 16 Pro Max).
         // Enforce true physical screen height so nav bar reaches the bottom edge.
-        // Only in iOS standalone PWA when WebKit reports truncated innerHeight
+        // If on iPhone in standalone mode, guarantee nav bar background extends completely to bottom edge
+        const nav = document.querySelector('nav');
+        if (nav) {
+          if (isIOS && isStandalone && screenH > winH && (screenH - winH) > 20) {
+            // WebKit status bar layout offset deficit (e.g. 59px on iPhone 16 Pro Max)
+            const gap = screenH - winH;
+            nav.style.setProperty('bottom', `-${gap}px`, 'important');
+            nav.style.setProperty('padding-bottom', `calc(${gap}px + max(16px, env(safe-area-inset-bottom, 24px)))`, 'important');
+          } else {
+            nav.style.removeProperty('bottom');
+            nav.style.removeProperty('padding-bottom');
+          }
+        }
+
         if (isIOS && isStandalone && screenH > winH && screenH > 500) {
           document.documentElement.style.setProperty('--app-height', screenH + 'px');
-          document.documentElement.style.setProperty('height', screenH + 'px', 'important');
-          if (document.body) {
-            document.body.style.setProperty('height', screenH + 'px', 'important');
-          }
         } else {
           document.documentElement.style.removeProperty('--app-height');
-          document.documentElement.style.removeProperty('height');
-          if (document.body) {
-            document.body.style.removeProperty('height');
-            document.body.style.removeProperty('min-height');
-            document.body.style.removeProperty('max-height');
-          }
         }
 
         // Lock window scroll so header never collides with Dynamic Island / Status Bar
@@ -14196,7 +14196,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=45')
+        navigator.serviceWorker.register('./sw.js?v=46')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
