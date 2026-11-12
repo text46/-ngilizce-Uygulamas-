@@ -790,16 +790,23 @@
       max-width: 500px !important;
       margin: 0 auto !important;
       height: calc(max(env(safe-area-inset-top, 0px), 44px) + 14px) !important;
-      background: linear-gradient(180deg, rgba(4, 9, 16, 0.98) 0%, rgba(4, 9, 16, 0.88) 60%, rgba(4, 9, 16, 0) 100%) !important;
-      backdrop-filter: blur(20px) saturate(180%) !important;
-      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      opacity: 0 !important;
+      transition: opacity 0.25s ease !important;
+      backdrop-filter: blur(20px) saturate(190%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
       -webkit-mask-image: linear-gradient(180deg, black 0%, black 65%, transparent 100%) !important;
       mask-image: linear-gradient(180deg, black 0%, black 65%, transparent 100%) !important;
       z-index: 998 !important;
       pointer-events: none !important;
     }
+    .ios-status-bar-glass.scrolled {
+      opacity: 1 !important;
+    }
+    body.dark-theme .ios-status-bar-glass {
+      background: linear-gradient(180deg, rgba(8, 16, 34, 0.85) 0%, rgba(8, 16, 34, 0.55) 60%, rgba(8, 16, 34, 0) 100%) !important;
+    }
     body:not(.dark-theme) .ios-status-bar-glass {
-      background: linear-gradient(180deg, rgba(244, 248, 253, 0.98) 0%, rgba(244, 248, 253, 0.88) 60%, rgba(244, 248, 253, 0) 100%) !important;
+      background: linear-gradient(180deg, rgba(244, 248, 253, 0.94) 0%, rgba(244, 248, 253, 0.70) 60%, rgba(244, 248, 253, 0) 100%) !important;
     }
 
     /* MAIN CONTAINER & VIEW TRANSITIONS */
@@ -13313,6 +13320,10 @@
         if (homeNav) homeNav.classList.add('active');
         renderStats(); renderChart(); updateCustomSelectsUI(); syncAllAppLevelDropdownsUI(); renderHomeView();
       }
+      try {
+        window.scrollTo(0, 0);
+        if (typeof updateStatusBarGlass === 'function') updateStatusBarGlass();
+      } catch (e) {}
     }
 
     function toggleGrammarLevel(headerElement) {
@@ -14170,6 +14181,21 @@
     document.addEventListener('click', () => { setTimeout(syncModalOpenState, 30); }, { passive: true });
     window.addEventListener('popstate', syncModalOpenState);
 
+    // Apple Native Status Bar Glass: Only becomes visible when user scrolls down
+    function updateStatusBarGlass() {
+      const glass = document.querySelector('.ios-status-bar-glass');
+      if (!glass) return;
+      if (window.scrollY > 8) {
+        glass.classList.add('scrolled');
+      } else {
+        glass.classList.remove('scrolled');
+      }
+    }
+    window.updateStatusBarGlass = updateStatusBarGlass;
+    window.addEventListener('scroll', updateStatusBarGlass, { passive: true });
+    document.addEventListener('DOMContentLoaded', updateStatusBarGlass);
+    window.addEventListener('pageshow', updateStatusBarGlass);
+
     /* ============================================================== */
     /* UNIVERSAL IPHONE & MOBILE VIEWPORT HEIGHT ENFORCER (IPHONE 11-18) */
     /* ============================================================== */
@@ -14211,7 +14237,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=54')
+        navigator.serviceWorker.register('./sw.js?v=55')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
