@@ -860,11 +860,32 @@
 
     #cards-view,
     #vocab-view,
-    #quiz-view {
+    #quiz-view,
+    #matching-view {
       overflow-y: hidden !important;
       overflow-x: hidden !important;
       scrollbar-width: none !important;
       -ms-overflow-style: none !important;
+    }
+
+    #matching-view {
+      height: calc(100dvh - max(env(safe-area-inset-top, 0px), 44px) - 8px - 65px - max(14px, env(safe-area-inset-bottom, 20px)) - 8px) !important;
+      min-height: calc(100dvh - max(env(safe-area-inset-top, 0px), 44px) - 8px - 65px - max(14px, env(safe-area-inset-bottom, 20px)) - 8px) !important;
+      display: none !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      padding-bottom: 4px !important;
+      box-sizing: border-box !important;
+    }
+    #matching-view.active {
+      display: flex !important;
+    }
+    #matching-view > div {
+      display: flex !important;
+      flex-direction: column !important;
+      height: 100% !important;
+      flex: 1 1 auto !important;
+      min-height: 0 !important;
     }
 
     #cards-view {
@@ -5067,15 +5088,16 @@
       box-shadow: none;
     }
     .matching-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
       grid-template-rows: repeat(5, 1fr);
-      gap: 10px;
-      padding: 4px 6px 12px 6px;
-      flex: 1;
-      min-height: 0;
-      box-sizing: border-box;
-      overflow-x: hidden;
+      gap: 12px !important;
+      padding: 6px 2px 10px 2px !important;
+      flex: 1 1 0% !important;
+      height: 100% !important;
+      min-height: 0 !important;
+      box-sizing: border-box !important;
+      overflow-x: hidden !important;
     }
     .match-card {
       background: var(--card-bg);
@@ -5083,21 +5105,25 @@
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 10px 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      padding: 12px 14px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      text-align: center !important;
       font-weight: 700;
-      font-size: 0.98rem;
+      font-size: 1.02rem !important;
+      line-height: 1.35 !important;
       font-family: var(--font-body);
       color: var(--text);
       cursor: pointer;
       transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease;
       user-select: none;
-      height: 100%;
+      height: 100% !important;
+      min-height: 60px !important;
       box-sizing: border-box;
       letter-spacing: -0.2px;
+      word-break: break-word;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28) !important;
     }
     .match-card:active {
       transform: scale(0.95);
@@ -13526,25 +13552,44 @@
       if (panel) panel.style.display = 'none';
 
       practiceWords.forEach(word => {
-        const q = generateQuizQuestionForWord(word, poolSource);
-        if (q) {
-          generatedQuizzes.push(q);
-        } else {
-          let wrongOptions = poolSource.filter(w => w.id !== word.id).sort(() => 0.5 - Math.random()).slice(0, 3).map(w => w.en);
-          let options = [word.en, ...wrongOptions].sort(() => 0.5 - Math.random());
-          let correctIdx = options.indexOf(word.en);
-          generatedQuizzes.push({
-            wordObj: word,
-            level: word.level,
-            q: `'${word.tr}' anlamına gelen İngilizce kelime hangisidir?`,
-            rawSentence: '',
-            q_tr: "",
-            ans_tr: word.tr,
-            opts: options,
-            ans: correctIdx,
-            exp: `'${word.en}' kelimesi '${word.tr}' demektir.`
-          });
+        const correctTr = (word.tr || '').trim();
+        const correctEn = (word.en || '').trim();
+
+        // 3 adet farklı Türkçe anlam seç (aynı kelime veya aynı anlam olmamalı)
+        let wrongWords = poolSource
+          .filter(w => w && w.id !== word.id && w.tr && w.tr.trim().toLowerCase() !== correctTr.toLowerCase())
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 3);
+        
+        let wrongOptions = wrongWords.map(w => w.tr.trim());
+        
+        // Eğer havuzda yetersiz kelime varsa yedekleme
+        while (wrongOptions.length < 3) {
+          wrongOptions.push("Diğer anlam " + (wrongOptions.length + 1));
         }
+
+        let options = [correctTr, ...wrongOptions].sort(() => 0.5 - Math.random());
+        let correctIdx = options.indexOf(correctTr);
+
+        generatedQuizzes.push({
+          wordObj: word,
+          level: word.level || 'A1',
+          q: `<div class="vocab-practice-q-box" style="text-align: center; padding: 10px 4px 6px 4px;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px;">Kelimenin Türkçe Anlamı Nedir?</div>
+                <div style="font-size: 1.85rem; font-weight: 900; color: var(--text); letter-spacing: -0.5px; margin-bottom: 4px; display: inline-flex; align-items: center; justify-content: center; gap: 10px;">
+                  <span>${correctEn}</span>
+                  <button type="button" class="quiz-audio-btn" onclick="event.stopPropagation(); playAudio('${correctEn.replace(/'/g, "\\'")}');" title="Telaffuzu Dinle" style="background: rgba(var(--primary-rgb), 0.14); border: 1px solid rgba(var(--primary-rgb), 0.28); color: var(--primary); border-radius: 50%; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                  </button>
+                </div>
+              </div>`,
+          rawSentence: '',
+          q_tr: '',
+          ans_tr: correctTr,
+          opts: options,
+          ans: correctIdx,
+          exp: `'${correctEn}' kelimesi '${correctTr}' anlamına gelir.`
+        });
       });
       const quizViewEl = document.getElementById('quiz-view');
       if (quizViewEl) quizViewEl.scrollTop = 0;
@@ -13815,6 +13860,12 @@
       if (currentMatchIndex >= practiceWords.length) { runNextPracticePhase(); return; }
 
       currentMatchGroup = practiceWords.slice(currentMatchIndex, currentMatchIndex + 5);
+      
+      if (grid) {
+        const rCount = Math.max(1, currentMatchGroup.length);
+        grid.style.setProperty('grid-template-rows', `repeat(${rCount}, 1fr)`, 'important');
+      }
+
       matchCardsData = [];
 
       let enCards = [];
@@ -14160,7 +14211,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=53')
+        navigator.serviceWorker.register('./sw.js?v=54')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
