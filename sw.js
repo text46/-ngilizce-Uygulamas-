@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lingomaster-v2026-58';
+const CACHE_NAME = 'lingomaster-v2026-59';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting(); 
