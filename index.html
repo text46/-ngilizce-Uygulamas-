@@ -780,6 +780,28 @@
       100% { transform: translateX(250%); }
     }
 
+    /* NATIVE IOS STATUS BAR FROSTED GLASS & TOP FADE DOCK */
+    .ios-status-bar-glass {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: 500px !important;
+      margin: 0 auto !important;
+      height: calc(max(env(safe-area-inset-top, 0px), 44px) + 14px) !important;
+      background: linear-gradient(180deg, rgba(4, 9, 16, 0.98) 0%, rgba(4, 9, 16, 0.88) 60%, rgba(4, 9, 16, 0) 100%) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-mask-image: linear-gradient(180deg, black 0%, black 65%, transparent 100%) !important;
+      mask-image: linear-gradient(180deg, black 0%, black 65%, transparent 100%) !important;
+      z-index: 998 !important;
+      pointer-events: none !important;
+    }
+    body:not(.dark-theme) .ios-status-bar-glass {
+      background: linear-gradient(180deg, rgba(244, 248, 253, 0.98) 0%, rgba(244, 248, 253, 0.88) 60%, rgba(244, 248, 253, 0) 100%) !important;
+    }
+
     /* MAIN CONTAINER & VIEW TRANSITIONS */
     main {
       flex: 1 1 0% !important;
@@ -787,14 +809,12 @@
       flex-direction: column !important;
       overflow: hidden !important;
       margin-top: 0 !important;
-      padding-top: calc(max(env(safe-area-inset-top, 0px), 20px) + 8px) !important;
+      padding-top: calc(max(env(safe-area-inset-top, 0px), 44px) + 8px) !important;
       padding-left: 16px !important;
       padding-right: 16px !important;
       padding-bottom: calc(65px + max(14px, env(safe-area-inset-bottom, 20px))) !important;
       position: relative !important;
       min-height: 0 !important;
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0, transparent max(env(safe-area-inset-top, 0px), 20px), black calc(max(env(safe-area-inset-top, 0px), 20px) + 14px), black 100%) !important;
-      mask-image: linear-gradient(to bottom, transparent 0, transparent max(env(safe-area-inset-top, 0px), 20px), black calc(max(env(safe-area-inset-top, 0px), 20px) + 14px), black 100%) !important;
     }
 
     .view {
@@ -8488,6 +8508,9 @@
 </head>
 <body class="dark-theme" style="background-color: #040910; color-scheme: dark;">
 
+  <!-- NATIVE IOS STATUS BAR FROSTED GLASS & TOP FADE DOCK -->
+  <div class="ios-status-bar-glass" aria-hidden="true"></div>
+
   <!-- DİKEY MOD KİLİT EKRANI (PORTRAIT ORIENTATION ENFORCER) -->
   <div id="portrait-lock-overlay">
     <div class="portrait-lock-card">
@@ -14137,7 +14160,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=52')
+        navigator.serviceWorker.register('./sw.js?v=53')
           .then(registration => {
             registration.update();
             console.log('Premium Offline Motoru Aktif!');
