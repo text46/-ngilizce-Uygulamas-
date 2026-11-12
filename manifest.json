@@ -1,7 +1,7 @@
 {
-  "name": "LingoMaster",
-  "short_name": "LingoMaster",
-  "description": "LingoMaster - Premium İngilizce Kelime ve Telaffuz Uygulaması",
+  "name": "Lingo Master",
+  "short_name": "Lingo Master",
+  "description": "Lingo Master - Premium İngilizce Kelime ve Telaffuz Uygulaması",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
